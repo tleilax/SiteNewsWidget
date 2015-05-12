@@ -9,7 +9,7 @@
         
         <fieldset>
             <label for="content"><?= _('Inhalt') ?></label>
-            <textarea name="content" id="content" class="add_toolbar"><?= htmlReady($content) ?></textarea>
+            <textarea name="content" id="content" class="add_toolbar" data-secure><?= htmlReady($content) ?></textarea>
         </fieldset>
     </fieldset>
 
