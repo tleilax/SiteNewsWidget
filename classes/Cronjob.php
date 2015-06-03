@@ -94,7 +94,6 @@ class Cronjob extends \CronJob
             echo 'Activating for perm "' . $perm . '"' . PHP_EOL;
             $this->activatePluginForRole($plugin_id, $config[$perm]['role_id']);
             $this->positionWidgetByPerm($plugin_id, $perm);
-
         }
 
         foreach ($deactivate as $perm) {
