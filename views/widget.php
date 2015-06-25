@@ -14,7 +14,7 @@
     </nav>
 <? endif; ?>
 <? foreach ($entries as $entry): ?>
-    <article>
+    <article <? if ($entry->is_new): ?>class="new" data-visiturl="<?= $controller->url_for('visit/') ?>"<? endif; ?>>
         <header>
             <h1>
                 <a href="<?= URLHelper::getLink('?sitenews-toggle=' . $entry->id) ?>">
@@ -33,6 +33,7 @@
                     <?= strftime('%x', $entry->expires) ?>
                 <? endif; ?>
                 </span>
+                <span style="color: #050;"><?= $entry->views ?></span>
             <? if ($is_root): ?>
                 <a href="<?= $controller->url_for('edit', $entry->id) ?>" data-dialog>
                     <?= Assets::img('icons/16/blue/edit.png', tooltip2(_('Eintrag bearbeiten'))) ?>

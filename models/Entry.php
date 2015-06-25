@@ -11,6 +11,21 @@ class Entry extends \SimpleORMap
             'assoc_foreign_key' => 'user_id',
             'foreign_key' => 'user_id',
         );
+        $config['additional_fields']['is_new'] = array(
+            'get' => function ($item) {
+                return !object_get_visit($item->id, 'news', '', '', $GLOBALS['user']->id);
+            },
+            'set' => function ($item, $field, $value) {
+                object_set_visit($item->id, 'news', $GLOBALS['user']->id);
+                object_add_view($item->id);
+            },
+        );
+        $config['additional_fields']['views'] = array(
+            'get' => function ($item) {
+                return object_return_views($item->id);
+            },
+            'set' => false,
+        );
 
         parent::configure($config);
     }

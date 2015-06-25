@@ -24,12 +24,12 @@
             <label for="subject"><?= _('Titel') ?></label>
             <input required type="text" name="subject" id="subject" value="<?= htmlReady($entry->subject) ?>" placeholder="<?= _('Titel des Eintrags') ?>">
         </fieldset>
-        
+
         <fieldset>
             <label for="content"><?= _('Inhalt') ?></label>
             <textarea required name="content" id="content" class="add_toolbar" data-secure placeholder="<?= _('Inhalt des Eintrags') ?>"><?= htmlReady($entry->content) ?></textarea>
         </fieldset>
-        
+
     </fieldset>
 
     <div data-dialog-button>
