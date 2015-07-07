@@ -19,11 +19,6 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         $this->config = SiteNews\Config::Get();
 
-        if (Request::isXhr()) {
-            header('Content-Type: text/html;charset=windows-1252');
-            header('X-Initialize-Dialog: true');
-        }
-
         $this->is_root = $GLOBALS['perm']->have_perm('root');
         $this->perm    = $this->is_root
                        ? Request::option('perm', 'tutor')
@@ -183,6 +178,11 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
     protected function getTemplate($template, $layout = false)
     {
+        if (Request::isXhr()) {
+            header('Content-Type: text/html;charset=windows-1252');
+            header('X-Initialize-Dialog: true');
+        }
+
         $factory  = new Flexi_TemplateFactory(__DIR__ . '/views');
         $template = $factory->open($template);
         $template->controller = $this;
