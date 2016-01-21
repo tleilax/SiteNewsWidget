@@ -118,10 +118,10 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
-    public function visit_action()
+    public function visit_action($id)
     {
-        $id = Request::option('sitenews-toggle');
-        SiteNews\Entry::find($id)->is_new = true;
+        // $id = Request::option('sitenews-toggle');
+        // SiteNews\Entry::find($id)->is_new = true;
 
         header('Content-Type: application/json');
         echo json_encode(true);

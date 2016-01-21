@@ -14,7 +14,7 @@
     </nav>
 <? endif; ?>
 <? foreach ($entries as $entry): ?>
-    <article <? if ($entry->is_new): ?>class="new" data-visiturl="<?= $controller->url_for('visit/') ?>"<? endif; ?>>
+    <article <? if ($entry->is_new): ?>class="new" data-visiturl="<?= $controller->url_for('visit/' . $entry->id) ?>"<? endif; ?>>
         <header>
             <h1>
                 <a href="<?= URLHelper::getLink('?sitenews-toggle=' . $entry->id) ?>">
