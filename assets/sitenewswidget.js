@@ -1,12 +1,12 @@
 (function ($) {
     'use strict';
-    
+
     function xprintf(str, params) {
         return str.replace(/#{(\w+)}/g, function(chunk, key) {
             return params.hasOwnProperty(key) ? params[key] : chunk;
         });
     };
-    
+
     $(document).on('ajaxComplete', function (event, jqxhr) {
         if (jqxhr.getResponseHeader('X-Initialize-Dialog')) {
             $('.ui-dialog-content textarea.add_toolbar').addToolbar();
@@ -26,7 +26,7 @@
             perm       = $(this).data().perm,
             url        = xprintf(source_url, {perm: perm}),
             timeout;
-        
+
         timeout = setTimeout(function() {
             STUDIP.Overlay.show(true, '.sitenews-widget');
         }, 200);
@@ -35,16 +35,8 @@
             clearTimeout(timeout);
             STUDIP.Overlay.hide();
         });
-        
+
         event.preventDefault();
-    });
-    
-    $(document).on('click submit', '[data-sitenews-confirm]', function (event) {
-        var question = $(this).data().confirmSitenews || $(this).attr('title') || $(this).text();
-        if (!confirm(question)) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
     });
 
     $(document).on('change', '.sitenews-editor :checkbox[name="visibility[]"][value="autor"]', function (event) {
