@@ -39,7 +39,7 @@
                     <?= Assets::img('icons/16/blue/edit.png', tooltip2(_('Eintrag bearbeiten'))) ?>
                 </a>
                 <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post" data-confirm="<?= _('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
-                    <?= Assets::input('icons/16/blue/trash.png', tooltip2(_('Eintrag löschen'))) ?>
+                    <?= Icon::create('icons/blue/trash.svg', tooltip2(_('Eintrag löschen')))->render(Icon::SVG | Icon::INPUT) ?>
                 </form>
             <? endif; ?>
             </nav>
