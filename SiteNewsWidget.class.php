@@ -48,11 +48,11 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if ($this->is_root) {
             $nav = new Navigation('', PluginEngine::getLink($this, array(), 'add'));
-            $nav->setImage('icons/16/blue/add.png', tooltip2(_('Eintrag hinzufügen')) + array('data-dialog' => ''));
+            $nav->setImage(Icon::create('add', 'clickable') , tooltip2(_('Eintrag hinzufügen')) + array('data-dialog' => ''));
             $navigation[] = $nav;
 
             $nav = new Navigation('', PluginEngine::getLink($this, array(), 'settings'));
-            $nav->setImage('icons/16/blue/admin.png', tooltip2(_('Einstellungen')) + array('data-dialog' => 'size=auto'));
+            $nav->setImage(Icon::create('admin', 'clickable'), tooltip2(_('Einstellungen')) + array('data-dialog' => 'size=auto'));
             $navigation[] = $nav;
         }
 
@@ -114,7 +114,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         $entry->expires    = strtotime(Request::get('expires') . ' 23:59:59');
         $entry->store();
 
-        PageLayout::postMessage(MessageBox::success(_('Der Eintrag wurde gespeichert.')));
+        PageLayout::postSuccess(_('Der Eintrag wurde gespeichert.'));
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
@@ -139,7 +139,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         SiteNews\Entry::find($id)->delete();
 
-        PageLayout::postMessage(MessageBox::success(_('Der Eintrag wurde gelöscht.')));
+        PageLayout::postSuccess(_('Der Eintrag wurde gelöscht.'));
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
@@ -166,7 +166,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
             Config::get()->store('SITE_NEWS_WIDGET_TITLE', $title);
 
-            PageLayout::postMessage(MessageBox::success(_('Die Einstellungen wurden gespeichert.')));
+            PageLayout::postSuccess(_('Die Einstellungen wurden gespeichert.'));
             header('Location: ' . URLHelper::getURL('dispatch.php/start'));
             return;
         }
