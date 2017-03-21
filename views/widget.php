@@ -22,10 +22,14 @@
                 </a>
             </h1>
             <nav>
+            <? if ($entry->author !== null): ?>
                 <a href="<?= URLHelper::getLink('dispatch.php/profile?username=' . $entry->author->username) ?>">
                     <?= Avatar::getAvatar($entry->author->id)->getImageTag(Avatar::SMALL) ?>
                     <?= htmlReady($entry->author->getFullname()) ?>
                 </a>
+            <? else: ?>
+                <?= _('unbekannt') ?>
+            <? endif; ?>
                 <span>
                     <?= strftime('%x', $entry->mkdate) ?>
                 <? if ($is_root): ?>
