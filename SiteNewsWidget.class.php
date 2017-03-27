@@ -121,7 +121,9 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
     public function visit_action($id)
     {
         $id = Request::option('sitenews-toggle');
-        SiteNews\Entry::find($id)->is_new = false;
+        if ($entry = SiteNews\Entry::find($id)) {
+            $entry->is_new = false;
+        }
 
         header('Content-Type: application/json');
         echo json_encode(true);
