@@ -14,10 +14,10 @@
     </nav>
 <? endif; ?>
 <? foreach ($entries as $entry): ?>
-    <article <? if ($entry->is_new): ?>class="new" data-visiturl="<?= $controller->url_for('visit/' . $entry->id) ?>"<? endif; ?>>
+    <article <? if ($entry->is_new): ?>class="new" data-visiturl="<?= $controller->url_for('visit/' . $entry->id) ?>"<? elseif (in_array($entry->id, $open)): echo 'class="open"'; endif; ?> id="sitenews-<?= htmlReady($entry->id) ?>">
         <header>
             <h1>
-                <a href="<?= URLHelper::getLink('?sitenews-toggle=' . $entry->id) ?>">
+                <a href="<?= $controller->url_for('visit/' . $entry->id) ?>">
                     <?= htmlReady($entry->subject) ?>
                 </a>
             </h1>
@@ -59,4 +59,3 @@
     </section>
 <? endif; ?>
 </section>
-
