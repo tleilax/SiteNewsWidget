@@ -18,29 +18,36 @@ class Entry extends \SimpleORMap
      *
      * @param Array $config Configuration array
      */
-    public static function configure($config = array())
+    public static function configure($config = [])
     {
         $config['db_table'] = 'sitenews_entries';
-        $config['has_one']['author'] = array(
+        $config['has_one']['author'] = [
             'class_name'  => 'User',
             'assoc_foreign_key' => 'user_id',
             'foreign_key' => 'user_id',
-        );
-        $config['additional_fields']['is_new'] = array(
-            'get' => function ($item) {
-                return !object_get_visit($item->id, 'news', '', '', $GLOBALS['user']->id);
+        ];
+        $config['additional_fields']['is_new'] = [
+            'get' => function (Entry $entry) {
+                return !object_get_visit($entry->id, 'news', '', '', $GLOBALS['user']->id);
             },
-            'set' => function ($item, $field, $value) {
-                object_set_visit($item->id, 'news', $GLOBALS['user']->id);
-                object_add_view($item->id);
+            'set' => function (Entry $entry, $field, $value) {
+                object_set_visit($entry->id, 'news', $GLOBALS['user']->id);
+                object_add_view($entry->id);
             },
-        );
-        $config['additional_fields']['views'] = array(
-            'get' => function ($item) {
-                return object_return_views($item->id);
+        ];
+        $config['additional_fields']['is_active'] = [
+            'get' => function (Entry $entry) {
+                return $entry->activated
+                    && $entry->expires >= time();
             },
             'set' => false,
-        );
+        ];
+        $config['additional_fields']['views'] = [
+            'get' => function (Entry $entry) {
+                return object_return_views($entry->id);
+            },
+            'set' => false,
+        ];
 
         parent::configure($config);
     }
@@ -61,7 +68,8 @@ class Entry extends \SimpleORMap
         if ($only_visible) {
             $condition .= ' AND expires > UNIX_TIMESTAMP()';
         }
-        return self::findBySQL($condition, array($perm));
+        $condition .= " ORDER BY mkdate DESC";
+        return self::findBySQL($condition, [$perm]);
     }
 
     /**
@@ -80,7 +88,7 @@ class Entry extends \SimpleORMap
         if ($only_visible) {
             $condition .= ' AND expires > UNIX_TIMESTAMP()';
         }
-        return self::countBySQL($condition, array($perm));
+        return self::countBySQL($condition, [$perm]);
     }
 
     /**

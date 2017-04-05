@@ -50,15 +50,22 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
     protected function getNavigation()
     {
-        $navigation = array();
+        $navigation = [];
 
         if ($this->is_root) {
-            $nav = new Navigation('', PluginEngine::getLink($this, array(), 'add'));
-            $nav->setImage(Icon::create('add', 'clickable') , tooltip2(_('Eintrag hinzufügen')) + array('data-dialog' => ''));
+            $nav = new Navigation('', PluginEngine::getLink($this, [], 'add'));
+            $nav->setImage(Icon::create('add', 'clickable'), tooltip2(_('Eintrag hinzufügen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
 
-            $nav = new Navigation('', PluginEngine::getLink($this, array(), 'settings'));
-            $nav->setImage(Icon::create('admin', 'clickable'), tooltip2(_('Einstellungen')) + array('data-dialog' => 'size=auto'));
+            $nav = new Navigation('', '#');
+            $nav->setImage(Icon::create('checkbox-unchecked', 'clickable'), tooltip2(_('Inaktive Einträge ausblenden')) + [
+                'class'              => 'sitenews-active-toggle',
+                'data-show-inactive' => json_encode(true),
+            ]);
+            $navigation[] = $nav;
+
+            $nav = new Navigation('', PluginEngine::getLink($this, [], 'settings'));
+            $nav->setImage(Icon::create('admin', 'clickable'), tooltip2(_('Einstellungen')) + ['data-dialog' => 'size=auto']);
             $navigation[] = $nav;
         }
 

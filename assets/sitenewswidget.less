@@ -31,11 +31,11 @@
             font-size: 0.9em;
             border-right: 1px solid @base-color-20;
             text-align: center;
-            
+
             &:last-child {
                 border-right: 0;
             }
-            
+
             &.current {
                 background-color: fadeout(@base-color-20, 20%);
                 a {
@@ -44,4 +44,34 @@
             }
         }
     }
+
+    [data-active="false"] {
+        .transition(opacity 300ms);
+
+        header > nav {
+            .transition(all 300ms);
+            max-height: 1000px;
+
+            overflow: hidden;
+        }
+
+        &:not(:hover) {
+            opacity: 0.5;
+
+            header > nav {
+                max-height: 0;
+                padding-bottom: 0;
+                padding-top: 0;
+            }
+        }
+    }
+}
+
+a.sitenews-active-toggle[data-show-inactive="false"] {
+    img {
+        visibility: hidden;
+    }
+    .background-icon('checkbox-checked', 'clickable');
+    background-position: top left;
+    background-repeat: no-repeat;
 }
