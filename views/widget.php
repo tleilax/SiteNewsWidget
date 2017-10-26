@@ -14,7 +14,7 @@
     </nav>
 <? endif; ?>
 <? foreach ($entries as $entry): ?>
-    <article <? if ($entry->is_new): ?>class="new" data-visiturl=""<? elseif (in_array($entry->id, $open)): echo 'class="open"'; endif; ?> id="sitenews-<?= htmlReady($entry->id) ?>" data-active="<?= json_encode($entry->is_active) ?>">
+    <article <? if ($entry->is_new): ?>class="new"<? endif; ?>  data-visiturl="<?= $controller->url_for('visit/' . $entry->id) ?>" id="sitenews-<?= htmlReady($entry->id) ?>" data-active="<?= json_encode($entry->is_active) ?>">
         <header>
             <h1>
                 <a href="<?= $controller->url_for('visit/' . $entry->id) ?>">

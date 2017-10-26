@@ -28,7 +28,8 @@ class Entry extends \SimpleORMap
         ];
         $config['additional_fields']['is_new'] = [
             'get' => function (Entry $entry) {
-                return !object_get_visit($entry->id, 'news', '', '', $GLOBALS['user']->id);
+                $visit = object_get_visit($entry->id, 'news', '', '', $GLOBALS['user']->id);
+                return !$visit || $visit < $entry->mkdate;
             },
             'set' => function (Entry $entry, $field, $value) {
                 object_set_visit($entry->id, 'news', $GLOBALS['user']->id);

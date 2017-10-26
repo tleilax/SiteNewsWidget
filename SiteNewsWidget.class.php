@@ -7,8 +7,6 @@
  */
 class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 {
-    const SESSION_KEY = 'sitenews-open';
-
     public $config;
     protected $is_root;
 
@@ -25,10 +23,6 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         $this->perm    = $this->is_root
                        ? Request::option('perm', 'tutor')
                        : $GLOBALS['user']->perms;
-
-        if (!isset($_SESSION[self::SESSION_KEY])) {
-            $_SESSION[self::SESSION_KEY] = [];
-        }
     }
 
     public function getPluginName()
@@ -78,7 +72,6 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         $template->is_root = $this->is_root;
         $template->entries = SiteNews\Entry::findByPerm($perm, !$this->is_root);
         $template->perm    = $perm;
-        $template->open    = $_SESSION[self::SESSION_KEY];
         return $template->render();
     }
 
@@ -137,15 +130,6 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         $id = Request::option('sitenews-toggle', $id);
         if ($entry = SiteNews\Entry::find($id)) {
             $entry->is_new = false;
-
-            if (in_array($id, $_SESSION[self::SESSION_KEY])) {
-                $_SESSION[self::SESSION_KEY] = array_diff(
-                    $_SESSION[self::SESSION_KEY],
-                    [$id]
-                );
-            } else {
-                $_SESSION[self::SESSION_KEY][] = $id;
-            }
         }
 
         if (Request::isXhr()) {
