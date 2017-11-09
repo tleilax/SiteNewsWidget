@@ -3,13 +3,13 @@
         <legend class="hide-in-dialog"><?= _('Inhalte bearbeiten') ?></legend>
 
         <fieldset class="multi-checkbox-required">
-            <label for="visibility"><?= _('Sichtbar für') ?></label>
+            <label for="visibility"><?= _('Sichtbar fÃ¼r') ?></label>
         <? foreach ($controller->config as $status => $config): ?>
             <label>
                 <input type="checkbox" name="visibility[]" value="<?= htmlReady($status) ?>" <? if ($entry->isVisibleForPerm($status)) echo 'checked'; ?>>
                 <?= htmlReady($config['label']) ?>
             <? if ($status === 'autor'): ?>
-                <?= tooltipIcon(_('Gäste können nicht einzeln angesprochen werden. Die Einträge sind immer auch für Studenten sichtbar.')) ?>
+                <?= tooltipIcon(_('GÃ¤ste kÃ¶nnen nicht einzeln angesprochen werden. Die EintrÃ¤ge sind immer auch fÃ¼r Studenten sichtbar.')) ?>
             <? endif; ?>
             </label>
         <? endforeach; ?>

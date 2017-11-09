@@ -18,7 +18,7 @@ final class Config
     {
         return array(
             'autor'  => array(
-                'label'   => _('Gäste'),
+                'label'   => _('GÃ¤ste'),
                 'role_id' => 5,
             ),
             'tutor'  => array(

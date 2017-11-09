@@ -18,7 +18,7 @@
 
     $(document).on('submit', '.sitenews-editor', function (event) {
         if ($('.multi-checkbox-required :checkbox', this).length > 0 && $('.multi-checkbox-required :checkbox:checked', this).length === 0) {
-            window.alert("Bitte w‰hlen Sie mindestens eine Sichtbarkeit aus.".toLocaleString());
+            window.alert("Bitte w√§hlen Sie mindestens eine Sichtbarkeit aus.".toLocaleString());
             event.preventDefault();
         }
     });
