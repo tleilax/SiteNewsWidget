@@ -42,8 +42,9 @@
                 <a href="<?= $controller->url_for('edit', $entry->id) ?>" data-dialog>
                     <?= Icon::create('edit', 'clickable', tooltip2(_('Eintrag bearbeiten')))?>
                 </a>
-                <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post" data-confirm="<?= _('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
-                    <?= Icon::create('trash', 'clickable', tooltip2(_('Eintrag löschen')))->render(Icon::SVG | Icon::INPUT) ?>
+                <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post"
+                    data-confirm="<?= _('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
+                    <?= Icon::create('trash', 'clickable', array_merge(tooltip2(_('Eintrag löschen')), ['align' => 'middle']))->asInput() ?>
                 </form>
             <? endif; ?>
             </nav>

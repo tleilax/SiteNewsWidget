@@ -192,7 +192,6 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
     protected function getTemplate($template, $layout = false)
     {
         if (Request::isXhr()) {
-            header('Content-Type: text/html;charset=windows-1252');
             header('X-Initialize-Dialog: true');
         }
 
@@ -209,12 +208,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
     {
         $args = array_slice(func_get_args(), 1);
         $title = vsprintf($title, $args);
-
-        if (Request::isXhr()) {
-            header('X-Title: ' . $title);
-        } else {
-            PageLayout::setTitle($title);
-        }
+        PageLayout::setTitle($title);
     }
 
     public function url_for($to)
