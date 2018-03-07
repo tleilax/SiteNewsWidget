@@ -38,7 +38,7 @@ class Cronjob extends \CronJob
      */
     public static function getDescription()
     {
-        return _('Prüft die Gültigkeit der Einträge für "In eigener Sache" und (de)aktiviert das Widget für die entsprechenden Nutzerkreise.');
+        return _('PrÃ¼ft die GÃ¼ltigkeit der EintrÃ¤ge fÃ¼r "In eigener Sache" und (de)aktiviert das Widget fÃ¼r die entsprechenden Nutzerkreise.');
     }
 
     /**

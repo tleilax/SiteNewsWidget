@@ -29,7 +29,7 @@ class AddConfigEntry extends Migration
         $statement = DBManager::get()->prepare($query);
         $statement->bindValue(':field', 'SITE_NEWS_WIDGET_TITLE');
         $statement->bindValue(':value', 'In eigener Sache');
-        $statement->bindValue(':description', 'Enthält den Titel des "Neuigkeiten an diesem Stud.IP-Standort"-Widgets');
+        $statement->bindValue(':description', 'EnthÃ¤lt den Titel des "Neuigkeiten an diesem Stud.IP-Standort"-Widgets');
         $statement->execute();
     }
 

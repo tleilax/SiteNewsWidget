@@ -48,11 +48,11 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if ($this->is_root) {
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'add'));
-            $nav->setImage(Icon::create('add', 'clickable'), tooltip2(_('Eintrag hinzufügen')) + ['data-dialog' => '']);
+            $nav->setImage(Icon::create('add', 'clickable'), tooltip2(_('Eintrag hinzufÃ¼gen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
 
             $nav = new Navigation('', '#');
-            $nav->setImage(Icon::create('checkbox-unchecked', 'clickable'), tooltip2(_('Inaktive Einträge ausblenden')) + [
+            $nav->setImage(Icon::create('checkbox-unchecked', 'clickable'), tooltip2(_('Inaktive EintrÃ¤ge ausblenden')) + [
                 'class'              => 'sitenews-active-toggle',
                 'data-show-inactive' => json_encode(true),
             ]);
@@ -81,7 +81,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        $this->setPageTitle(_('Eintrag hinzufügen'));
+        $this->setPageTitle(_('Eintrag hinzufÃ¼gen'));
 
         $template = $this->getTemplate('edit.php', true);
         $template->entry   = new SiteNews\Entry;
@@ -152,7 +152,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         SiteNews\Entry::find($id)->delete();
 
-        PageLayout::postSuccess(_('Der Eintrag wurde gelöscht.'));
+        PageLayout::postSuccess(_('Der Eintrag wurde gelÃ¶scht.'));
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
@@ -192,7 +192,6 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
     protected function getTemplate($template, $layout = false)
     {
         if (Request::isXhr()) {
-            header('Content-Type: text/html;charset=windows-1252');
             header('X-Initialize-Dialog: true');
         }
 
@@ -209,12 +208,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
     {
         $args = array_slice(func_get_args(), 1);
         $title = vsprintf($title, $args);
-
-        if (Request::isXhr()) {
-            header('X-Title: ' . $title);
-        } else {
-            PageLayout::setTitle($title);
-        }
+        PageLayout::setTitle($title);
     }
 
     public function url_for($to)

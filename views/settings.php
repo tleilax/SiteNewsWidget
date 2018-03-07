@@ -1,4 +1,4 @@
-<form action="<?= $controller->url_for('settings', $entry->id) ?>" method="post" class="sitenews-editor studip_form">
+<form action="<?= $controller->url_for('settings', $entry->id) ?>" method="post" class="sitenews-editor default">
     <fieldset>
         <legend class="hide-in-dialog"><?= _('Einstellungen bearbeiten') ?></legend>
 
