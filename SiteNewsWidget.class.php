@@ -7,12 +7,17 @@
  */
 class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 {
+    const GETTEXT_DOMAIN = 'site-news';
+
     public $config;
     protected $is_root;
 
     public function __construct()
     {
         parent::__construct();
+
+        bindtextdomain(static::GETTEXT_DOMAIN, $this->getPluginPath() . '/locale');
+        bind_textdomain_codeset(static::GETTEXT_DOMAIN, 'UTF-8');
 
         StudipAutoloader::addAutoloadPath($this->getPluginPath() . '/models', 'SiteNews');
         StudipAutoloader::addAutoloadPath($this->getPluginPath() . '/classes', 'SiteNews');
@@ -27,7 +32,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
     public function getPluginName()
     {
-        return Config::get()->SITE_NEWS_WIDGET_TITLE ?: _('In eigener Sache');
+        return Config::get()->SITE_NEWS_WIDGET_TITLE ?: $this->_('In eigener Sache');
     }
 
     public function getPortalTemplate()
@@ -48,18 +53,18 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if ($this->is_root) {
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'add'));
-            $nav->setImage(Icon::create('add', 'clickable'), tooltip2(_('Eintrag hinzufügen')) + ['data-dialog' => '']);
+            $nav->setImage(Icon::create('add'), tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
 
             $nav = new Navigation('', '#');
-            $nav->setImage(Icon::create('checkbox-unchecked', 'clickable'), tooltip2(_('Inaktive Einträge ausblenden')) + [
+            $nav->setImage(Icon::create('checkbox-unchecked'), tooltip2($this->_('Inaktive Einträge ausblenden')) + [
                 'class'              => 'sitenews-active-toggle',
                 'data-show-inactive' => json_encode(true),
             ]);
             $navigation[] = $nav;
 
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'settings'));
-            $nav->setImage(Icon::create('admin', 'clickable'), tooltip2(_('Einstellungen')) + ['data-dialog' => 'size=auto']);
+            $nav->setImage(Icon::create('admin'), tooltip2($this->_('Einstellungen')) + ['data-dialog' => 'size=auto']);
             $navigation[] = $nav;
         }
 
@@ -81,7 +86,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        $this->setPageTitle(_('Eintrag hinzufügen'));
+        $this->setPageTitle($this->_('Eintrag hinzufügen'));
 
         $template = $this->getTemplate('edit.php', true);
         $template->entry   = new SiteNews\Entry;
@@ -94,7 +99,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        $this->setPageTitle(_('Eintrag bearbeiten'));
+        $this->setPageTitle($this->_('Eintrag bearbeiten'));
 
         $template = $this->getTemplate('edit.php', true);
         $template->entry = SiteNews\Entry::find($id);
@@ -121,7 +126,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         $entry->expires    = strtotime(Request::get('expires') . ' 23:59:59');
         $entry->store();
 
-        PageLayout::postSuccess(_('Der Eintrag wurde gespeichert.'));
+        PageLayout::postSuccess($this->_('Der Eintrag wurde gespeichert.'));
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
@@ -152,7 +157,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         SiteNews\Entry::find($id)->delete();
 
-        PageLayout::postSuccess(_('Der Eintrag wurde gelöscht.'));
+        PageLayout::postSuccess($this->_('Der Eintrag wurde gelöscht.'));
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
@@ -171,15 +176,15 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        $this->setPageTitle(_('Einstellungen'));
+        $this->setPageTitle($this->_('Einstellungen'));
 
         if (Request::isPost()) {
-            $title = Request::get('title', _('In eigener Sache'));
+            $title = Request::get('title', $this->_('In eigener Sache'));
             $title = trim($title);
 
             Config::get()->store('SITE_NEWS_WIDGET_TITLE', $title);
 
-            PageLayout::postSuccess(_('Die Einstellungen wurden gespeichert.'));
+            PageLayout::postSuccess($this->_('Die Einstellungen wurden gespeichert.'));
             header('Location: ' . URLHelper::getURL('dispatch.php/start'));
             return;
         }
@@ -201,6 +206,9 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         if ($layout && !Request::isXhr()) {
             $template->set_layout($GLOBALS['template_factory']->open('layouts/base.php'));
         }
+        $template->_ = function ($string) {
+            return $this->_($string);
+        };
         return $template;
     }
 
@@ -218,11 +226,67 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         if (is_array($last)) {
             $params = array_pop($arguments);
         } else {
-            $params = array();
+            $params = [];
         }
 
         $path = implode('/', $arguments);
 
         return PluginEngine::getURL($this, $params, $path);
+    }
+
+    /**
+     * Plugin localization for a single string.
+     * This method supports sprintf()-like execution if you pass additional
+     * parameters.
+     *
+     * @param String $string String to translate
+     * @return translated string
+     */
+    public function _($string)
+    {
+        $result = static::GETTEXT_DOMAIN === null
+                ? $string
+                : dcgettext(static::GETTEXT_DOMAIN, $string, LC_MESSAGES);
+        if ($result === $string) {
+            $result = _($string);
+        }
+
+        if (func_num_args() > 1) {
+            $arguments = array_slice(func_get_args(), 1);
+            $result = vsprintf($result, $arguments);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Plugin localization for plural strings.
+     * This method supports sprintf()-like execution if you pass additional
+     * parameters.
+     *
+     * @param String $string0 String to translate (singular)
+     * @param String $string1 String to translate (plural)
+     * @param mixed  $n       Quantity factor (may be an array or array-like)
+     * @return translated string
+     */
+    public function _n($string0, $string1, $n)
+    {
+        if (is_array($n)) {
+            $n = count($n);
+        }
+
+        $result = static::GETTEXT_DOMAIN === null
+                ? $string0
+                : dngettext(static::GETTEXT_DOMAIN, $string0, $string1, $n);
+        if ($result === $string0 || $result === $string1) {
+            $result = ngettext($string0, $string1, $n);
+        }
+
+        if (func_num_args() > 3) {
+            $arguments = array_slice(func_get_args(), 3);
+            $result = vsprintf($result, $arguments);
+        }
+
+        return $result;
     }
 }

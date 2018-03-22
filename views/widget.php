@@ -4,7 +4,7 @@
         <ul>
         <? foreach ($controller->config as $status => $config): ?>
             <li <? if ($perm === $status) echo 'class="current"'; ?>>
-                <a href="<?= URLHelper::getLink('?', array('perm' => $status)) ?>" data-perm="<?= htmlReady($status) ?>">
+                <a href="<?= URLHelper::getLink('?', ['perm' => $status]) ?>" data-perm="<?= htmlReady($status) ?>">
                     <?= htmlReady($config['label']) ?>
                     (<?= SiteNews\Entry::countByPerm($status, false) ?>)
                 </a>
@@ -28,7 +28,7 @@
                     <?= htmlReady($entry->author->getFullname()) ?>
                 </a>
             <? else: ?>
-                <?= _('unbekannt') ?>
+                <?= $_('unbekannt') ?>
             <? endif; ?>
                 <span>
                     <?= strftime('%x', $entry->mkdate) ?>
@@ -40,11 +40,11 @@
                 <span style="color: #050;"><?= $entry->views ?></span>
             <? if ($is_root): ?>
                 <a href="<?= $controller->url_for('edit', $entry->id) ?>" data-dialog>
-                    <?= Icon::create('edit', 'clickable', tooltip2(_('Eintrag bearbeiten')))?>
+                    <?= Icon::create('edit', 'clickable', tooltip2($_('Eintrag bearbeiten')))?>
                 </a>
                 <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post"
-                    data-confirm="<?= _('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
-                    <?= Icon::create('trash', 'clickable', array_merge(tooltip2(_('Eintrag löschen')), ['align' => 'middle']))->asInput() ?>
+                    data-confirm="<?= $_('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
+                    <?= Icon::create('trash', 'clickable', array_merge(tooltip2($_('Eintrag löschen')), ['align' => 'middle']))->asInput() ?>
                 </form>
             <? endif; ?>
             </nav>
@@ -56,7 +56,7 @@
 <? endforeach; ?>
 <? if (!$entries): ?>
     <section>
-        <?= _('Es sind keine Einträge vorhanden') ?>
+        <?= $_('Es sind keine Einträge vorhanden') ?>
     </section>
 <? endif; ?>
 </section>

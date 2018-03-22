@@ -1,6 +1,8 @@
 <?php
 namespace SiteNews;
 
+use SiteNewsWidget;
+
 /**
  * This class represents the config for the site news widget.
  *
@@ -16,23 +18,23 @@ final class Config
      */
     public static function Get()
     {
-        return array(
-            'autor'  => array(
-                'label'   => _('Gäste'),
+        return [
+            'autor'  => [
+                'label'   => dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Gäste'),
                 'role_id' => 5,
-            ),
-            'tutor'  => array(
-                'label'   => _('Studierende'),
+            ],
+            'tutor'  => [
+                'label'   => dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Studierende'),
                 'role_id' => 6,
-            ),
-            'dozent' => array(
-                'label'   => _('Lehrende'),
+            ],
+            'dozent' => [
+                'label'   => dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Lehrende'),
                 'role_id' => 4,
-            ),
-            'admin'  => array(
-                'label'   => _('Admins'),
+            ],
+            'admin'  => [
+                'label'   => dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Admins'),
                 'role_id' => 2,
-            ),
-        );
+            ],
+        ];
     }
 }

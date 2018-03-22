@@ -1,7 +1,11 @@
 <?php
 namespace SiteNews;
 
-use PluginManager, RolePersistence, DBManager, PDO;
+use DBManager;
+use PDO;
+use PluginManager;
+use RolePersistence;
+use SiteNewsWidget;
 
 /**
  * SiteNewsCronjob.php
@@ -28,7 +32,7 @@ class Cronjob extends \CronJob
      */
     public static function getName()
     {
-        return _('"In eigener Sache" Cronjob');
+        return dgettext(SiteNewsWidget::GETTEXT_DOMAIN, '"In eigener Sache" Cronjob');
     }
 
     /**
@@ -38,7 +42,7 @@ class Cronjob extends \CronJob
      */
     public static function getDescription()
     {
-        return _('Prüft die Gültigkeit der Einträge für "In eigener Sache" und (de)aktiviert das Widget für die entsprechenden Nutzerkreise.');
+        return dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Prüft die Gültigkeit der Einträge für "In eigener Sache" und (de)aktiviert das Widget für die entsprechenden Nutzerkreise.');
     }
 
     /**
