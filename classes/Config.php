@@ -20,19 +20,19 @@ final class Config
     {
         return [
             'autor'  => [
-                'label'   => dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Gäste'),
+                'label'   => 'Gäste',
                 'role_id' => 5,
             ],
             'tutor'  => [
-                'label'   => dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Studierende'),
+                'label'   => 'Studierende',
                 'role_id' => 6,
             ],
             'dozent' => [
-                'label'   => dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Lehrende'),
+                'label'   => 'Lehrende',
                 'role_id' => 4,
             ],
             'admin'  => [
-                'label'   => dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Admins'),
+                'label'   => 'Admins',
                 'role_id' => 2,
             ],
         ];
