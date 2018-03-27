@@ -32,7 +32,7 @@ class Cronjob extends \CronJob
      */
     public static function getName()
     {
-        return dgettext(SiteNewsWidget::GETTEXT_DOMAIN, '"In eigener Sache" Cronjob');
+        return '"In eigener Sache" Cronjob';
     }
 
     /**
@@ -42,7 +42,7 @@ class Cronjob extends \CronJob
      */
     public static function getDescription()
     {
-        return dgettext(SiteNewsWidget::GETTEXT_DOMAIN, 'Prüft die Gültigkeit der Einträge für "In eigener Sache" und (de)aktiviert das Widget für die entsprechenden Nutzerkreise.');
+        return 'Prüft die Gültigkeit der Einträge für "In eigener Sache" und (de)aktiviert das Widget für die entsprechenden Nutzerkreise.';
     }
 
     /**

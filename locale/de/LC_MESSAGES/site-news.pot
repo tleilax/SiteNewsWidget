@@ -1,0 +1,112 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the SiteNewsWidget package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: SiteNewsWidget\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-03-22 11:36+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Fügt den Cronjob zum (De)Aktivieren des Widgets hinzu"
+msgstr ""
+
+msgid "\"In eigener Sache\" Cronjob"
+msgstr ""
+
+msgid ""
+"Prüft die Gültigkeit der Einträge für \"In eigener Sache\" und (de)aktiviert "
+"das Widget für die entsprechenden Nutzerkreise."
+msgstr ""
+
+msgid "Gäste"
+msgstr ""
+
+msgid "Studierende"
+msgstr ""
+
+msgid "Lehrende"
+msgstr ""
+
+msgid "Admins"
+msgstr ""
+
+msgid "In eigener Sache"
+msgstr ""
+
+msgid "Eintrag hinzufügen"
+msgstr ""
+
+msgid "Inaktive Einträge ausblenden"
+msgstr ""
+
+msgid "Einstellungen"
+msgstr ""
+
+msgid "Eintrag bearbeiten"
+msgstr ""
+
+msgid "Der Eintrag wurde gespeichert."
+msgstr ""
+
+msgid "Der Eintrag wurde gelöscht."
+msgstr ""
+
+msgid "Die Einstellungen wurden gespeichert."
+msgstr ""
+
+msgid "Einstellungen bearbeiten"
+msgstr ""
+
+msgid "Titel"
+msgstr ""
+
+msgid "Speichern"
+msgstr ""
+
+msgid "Abbrechen"
+msgstr ""
+
+msgid "Inhalte bearbeiten"
+msgstr ""
+
+msgid "Sichtbar für"
+msgstr ""
+
+msgid ""
+"Gäste können nicht einzeln angesprochen werden. Die Einträge sind immer auch "
+"für Studenten sichtbar."
+msgstr ""
+
+msgid "Anzeigen bis"
+msgstr ""
+
+msgid "Titel des Eintrags"
+msgstr ""
+
+msgid "Inhalt"
+msgstr ""
+
+msgid "Inhalt des Eintrags"
+msgstr ""
+
+msgid "unbekannt"
+msgstr ""
+
+msgid "Wollen Sie diesen Eintrag wirklich löschen?"
+msgstr ""
+
+msgid "Eintrag löschen"
+msgstr ""
+
+msgid "Es sind keine Einträge vorhanden"
+msgstr ""
