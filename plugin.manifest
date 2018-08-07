@@ -4,3 +4,4 @@ pluginclassname=SiteNewsWidget
 origin=UOL
 version=2.1
 studipMinVersion=4.0
+studipMaxVersion=4.1.99

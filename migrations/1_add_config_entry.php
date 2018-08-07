@@ -22,15 +22,14 @@ class AddConfigEntry extends Migration
      */
     public function up()
     {
-        $query = "INSERT IGNORE INTO `config` (`config_id`, `parent_id`, `field`, `value`, `is_default`, `type`,
-                                               `range`, `section`, `position`, `mkdate`, `chdate`, `description`, `comment`, `message_template`)
-                  VALUES (MD5(:field), '', :field, :value, '1', 'string',
-                          'global', '', '0', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), :description, '', '')";
-        $statement = DBManager::get()->prepare($query);
-        $statement->bindValue(':field', 'SITE_NEWS_WIDGET_TITLE');
-        $statement->bindValue(':value', 'In eigener Sache');
-        $statement->bindValue(':description', 'Enthält den Titel des "Neuigkeiten an diesem Stud.IP-Standort"-Widgets');
-        $statement->execute();
+        Config::get()->create('SITE_NEWS_WIDGET_TITLE', [
+            'value' => 'In eigener Sache',
+            'is_default' => 1,
+            'type' => 'string',
+            'range' => 'global',
+            'section' => 'Sprechstunden',
+            'description' => 'Enthält den Titel des "Neuigkeiten an diesem Stud.IP-Standort"-Widgets',
+        ]);
     }
 
     /**
@@ -38,7 +37,6 @@ class AddConfigEntry extends Migration
      */
     public function down()
     {
-        $query = "DELETE FROM `config` WHERE `field` IN ('SITE_NEWS_WIDGET_TITLE')";
-        DBManager::get()->exec($query);
+        Config::get()->delete('SITE_NEWS_WIDGET_TITLE');
     }
 }
