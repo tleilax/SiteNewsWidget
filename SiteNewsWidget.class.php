@@ -32,7 +32,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
     public function getPluginName()
     {
-        return Config::get()->SITE_NEWS_WIDGET_TITLE ?: $this->_('In eigener Sache');
+        return $this->_('In eigener Sache');
     }
 
     public function getPortalTemplate()
@@ -61,10 +61,6 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
                 'class'              => 'sitenews-active-toggle',
                 'data-show-inactive' => json_encode(true),
             ]);
-            $navigation[] = $nav;
-
-            $nav = new Navigation('', PluginEngine::getLink($this, [], 'settings'));
-            $nav->setImage(Icon::create('admin'), tooltip2($this->_('Einstellungen')) + ['data-dialog' => 'size=auto']);
             $navigation[] = $nav;
         }
 
@@ -168,30 +164,6 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         }
 
         echo $this->getContent($perm);
-    }
-
-    public function settings_action()
-    {
-        if (!$this->is_root) {
-            throw new AccessDeniedException();
-        }
-
-        $this->setPageTitle($this->_('Einstellungen'));
-
-        if (Request::isPost()) {
-            $title = Request::get('title', $this->_('In eigener Sache'));
-            $title = trim($title);
-
-            Config::get()->store('SITE_NEWS_WIDGET_TITLE', $title);
-
-            PageLayout::postSuccess($this->_('Die Einstellungen wurden gespeichert.'));
-            header('Location: ' . URLHelper::getURL('dispatch.php/start'));
-            return;
-        }
-
-        $template = $this->getTemplate('settings.php', true);
-        $template->title = Config::get()->SITE_NEWS_WIDGET_TITLE;
-        echo $template->render();
     }
 
     protected function getTemplate($template, $layout = false)
