@@ -28,7 +28,7 @@ class Cronjob extends \CronJob
     /**
      * Returns the name of the cronjob
      *
-     * @return String containing the name of the cronjob
+     * @return string containing the name of the cronjob
      */
     public static function getName()
     {
@@ -38,7 +38,7 @@ class Cronjob extends \CronJob
     /**
      * Returns the description of the cronjob.
      *
-     * @return String containing the description of the cronjob
+     * @return string containing the description of the cronjob
      */
     public static function getDescription()
     {
@@ -50,8 +50,7 @@ class Cronjob extends \CronJob
      */
     public function setUp()
     {
-        require 'Config.php';
-        require __DIR__ . '/../models/Entry.php';
+        require_once __DIR__ . '/../bootstrap.php';
     }
 
     /**
@@ -60,7 +59,7 @@ class Cronjob extends \CronJob
      * @param mixed $last_result The result of the last execution
      * @param array $parameters  Any defined parameters
      */
-    public function execute($last_result, $parameters = array())
+    public function execute($last_result, $parameters = [])
     {
         $info = PluginManager::getInstance()->getPluginInfo('SiteNewsWidget');
         if (!$info) {
@@ -70,19 +69,15 @@ class Cronjob extends \CronJob
         $plugin_id = $info['id'];
 
         $entries = Entry::findBySQL('expires > UNIX_TIMESTAMP()');
-        $config  = Config::Get();
-
-        $activate   = array();
-        $deactivate = array_keys($config);
-
         if (!$entries) {
             return;
         }
 
-        $perms = array();
+        $activate   = [];
+        $deactivate = array_keys(Config::Get());
 
         foreach ($entries as $entry) {
-            $visibilities = explode(',', $entry->visibility);
+            $visibilities = $entry->groups->pluck('group_id');
             $deactivate   = array_diff($deactivate, $visibilities);
 
             if (!$entry->activated) {
@@ -94,94 +89,93 @@ class Cronjob extends \CronJob
             }
         }
 
-        foreach ($activate as $perm) {
-            echo 'Activating for perm "' . $perm . '"' . PHP_EOL;
-            $this->activatePluginForRole($plugin_id, $config[$perm]['role_id']);
-            $this->positionWidgetByPerm($plugin_id, $perm);
+        foreach ($activate as $group) {
+            echo 'Activating for group "' . $group . '"' . PHP_EOL;
+            $this->activatePluginForGroup($plugin_id, $group);
+            $this->positionWidgetByGroup($plugin_id, $group);
         }
 
-        foreach ($deactivate as $perm) {
-            echo 'Deactivating for perm "' . $perm . '"' . PHP_EOL;
-            $this->deactivatePluginForRole($plugin_id, $config[$perm]['role_id']);
+        foreach ($deactivate as $group) {
+            echo 'Deactivating for group "' . $group . '"' . PHP_EOL;
+            $this->deactivatePluginForRole($plugin_id, $group);
         }
 
         if (mt_rand() / mt_getrandmax() <= self::GC_PROPABILITY) {
-            $this->gc($perm);
+            $this->gc();
         }
     }
 
     /**
      * Activates the widget (which is a plugin) for a certain role.
      *
-     * @param String $plugin_id Id of the plugin
-     * @param String $role_id   If of the role
+     * @param string $plugin_id Id of the plugin
+     * @param string $role_id   If of the role
      */
-    private function activatePluginForRole($plugin_id, $role_id)
+    private function activatePluginForRole($plugin_id, $group)
     {
-        RolePersistence::assignPluginRoles($plugin_id, array($role_id));
+        Group::find($group)->roles->each(function (GroupRole $role) {
+            RolePersistence::assignPluginRoles($plugin_id, $role->role_id);
+        });
     }
 
     /**
      * Deactivates the widget (which is a plugin) for a certain role.
      *
-     * @param String $plugin_id Id of the plugin
-     * @param String $role_id   If of the role
+     * @param string $plugin_id Id of the plugin
+     * @param string $role_id   If of the role
      */
-    private function deactivatePluginForRole($plugin_id, $role_id)
+    private function deactivatePluginForRole($plugin_id, $group)
     {
-        RolePersistence::deleteAssignedPluginRoles($plugin_id, array($role_id));
+        Group::find($group)->roles->each(function (GroupRole $role) {
+            RolePersistence::deleteAssignedPluginRoles($plugin_id, $role->role_id);
+        });
     }
 
     /**
-     * Positions the widget for a certain permission.
+     * Positions the widget for a certain group.
      *
-     * @param String $plugin_id Id of the plugin
-     * @param String $perm      The permission
+     * @param string $plugin_id Id of the plugin
+     * @param string $group      The permission
      */
-    private function positionWidgetByPerm($plugin_id, $perm)
+    private function positionWidgetByGroup($plugin_id, $group)
     {
         $query = "DELETE FROM `widget_user`
                   WHERE `pluginid` = :plugin_id
-                    AND `range_id` IN (
-                        SELECT `user_id`
-                        FROM `auth_user_md5`
-                        WHERE `perms` = :perm
-                    )";
-        $statement = DBManager::get()->prepare($query);
-        $statement->bindValue(':plugin_id', $plugin_id);
-        $statement->bindValue(':perm', $perm);
-        $statement->execute();
+                    AND `range_id` = :user_id";
+        $delete_statement = DBManager::get()->prepare($query);
+        $delete_statement->bindValue(':plugin_id', $plugin_id);
 
         $query = "UPDATE `widget_user`
                   SET `position` = `position` + 1
                   WHERE `col` = 0
-                    AND `range_id` IN (
-                        SELECT `user_id`
-                        FROM `auth_user_md5`
-                        WHERE `perms` = :perm
-                    )";
-        $statement = DBManager::get()->prepare($query);
-        $statement->bindValue(':perm', $perm);
-        $statement->execute();
+                    AND `range_id` = :user_id";
+        $reposition_statement = DBManager::get()->prepare($query);
 
         $query = "INSERT INTO `widget_user` (`pluginid`, `position`, `range_id`, `col`)
                   SELECT DISTINCT :plugin_id, 0, `user_id`, 0
                   FROM `auth_user_md5`
                   JOIN `widget_user` ON `auth_user_md5`.`user_id` = `widget_user`.`range_id`
                   WHERE `perms` = :perm";
-        $statement = DBManager::get()->prepare($query);
-        $statement->bindValue(':plugin_id', $plugin_id);
-        $statement->bindValue(':perm', $perm);
-        $statement->execute();
+        $add_statement = DBManager::get()->prepare($query);
+        $add_statement->bindValue(':plugin_id', $plugin_id);
+
+        Group::find($group)->eachUser(function ($user) use ($delete_statement, $reposition_statement, $add_statement) {
+            $delete_statement->bindValue(':user_id', $user->id);
+            $delete_statement->execute();
+
+            $reposition_statement->bindValue(':user_id', $user->id);
+            $reposition_statement->execute();
+
+            $add_statement->bindValue(':user_id', $user->id);
+            $add_statement->execute();
+        });
     }
 
     /**
      * Garbage collector. Reorders the defined widgets for users.
      * Removes gaps and high position numbers.
-     *
-     * @param String $perm The permission to garbage collect for
      */
-    private function gc($perm)
+    private function gc()
     {
         $query = "SELECT DISTINCT `range_id`
                   FROM `widget_user`

@@ -1,12 +1,16 @@
 <?php
+require_once __DIR__ . '/bootstrap.php';
+
 /**
  * SiteNewsWidget.class.php
  *
  * @author  Jan-Hendrik Willms <tleilax+studip@gmail.com>
  * @version 1.0
  */
-class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
+class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
 {
+    use SiteNews\PluginLocalizationTrait;
+
     const GETTEXT_DOMAIN = 'site-news';
 
     public $config;
@@ -16,32 +20,23 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
     {
         parent::__construct();
 
-        bindtextdomain(static::GETTEXT_DOMAIN, $this->getPluginPath() . '/locale');
-        bind_textdomain_codeset(static::GETTEXT_DOMAIN, 'UTF-8');
-
-        StudipAutoloader::addAutoloadPath($this->getPluginPath() . '/models', 'SiteNews');
-        StudipAutoloader::addAutoloadPath($this->getPluginPath() . '/classes', 'SiteNews');
-
-        $this->config = SiteNews\Config::Get();
+        $this->initializeLocalization(static::GETTEXT_DOMAIN);
 
         $this->is_root = $GLOBALS['perm']->have_perm('root');
-        $this->perm    = $this->is_root
-                       ? Request::option('perm', 'tutor')
-                       : $GLOBALS['user']->perms;
+        $this->group   = $this->is_root
+                       ? Request::option('group', SiteNews\Group::findFirst()->id)
+                       : null;
     }
 
     public function getPluginName()
     {
-        return $this->_('In eigener Sache');
+        return (string) SiteNews\Config::getTitle() ?: $this->_('In eigener Sache');
     }
 
     public function getPortalTemplate()
     {
-        $this->addStylesheet('assets/sitenewswidget.less');
-        PageLayout::addScript($this->getPluginURL() . '/assets/sitenewswidget.js');
-
         $widget = $GLOBALS['template_factory']->open('shared/string');
-        $widget->content = $this->getContent($this->perm);
+        $widget->content = $this->getContent($this->group);
         $widget->icons   = $this->getNavigation();
         $widget->title   = $this->getPluginName();
         return $widget;
@@ -52,7 +47,7 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         $navigation = [];
 
         if ($this->is_root) {
-            $nav = new Navigation('', PluginEngine::getLink($this, [], 'add'));
+            $nav = new Navigation('', $this->url_for('add'));
             $nav->setImage(Icon::create('add'), tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
 
@@ -62,18 +57,23 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
                 'data-show-inactive' => json_encode(true),
             ]);
             $navigation[] = $nav;
+
+            $nav = new Navigation('', $this->url_for('config'));
+            $nav->setImage(Icon::create('admin'), tooltip2($this->_('Einstellungen bearbeiten')) + ['data-dialog' => '']);
+            $navigation[] = $nav;
         }
 
         return $navigation;
     }
 
-    protected function getContent($perm)
+    protected function getContent($group)
     {
-        $template = $this->getTemplate('widget.php');
-        $template->is_root = $this->is_root;
-        $template->entries = SiteNews\Entry::findByPerm($perm, !$this->is_root);
-        $template->perm    = $perm;
-        return $template->render();
+        return $this->getTemplate('widget.php')->render([
+            'is_root' => $this->is_root,
+            'entries' => SiteNews\Entry::findByGroup($group, !$this->is_root),
+            'group'   => $group,
+            'config'  => SiteNews\Config::Get(),
+        ]);
     }
 
     public function add_action()
@@ -84,9 +84,10 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         $this->setPageTitle($this->_('Eintrag hinzufügen'));
 
-        $template = $this->getTemplate('edit.php', true);
-        $template->entry   = new SiteNews\Entry;
-        echo $template->render();
+        echo $this->getTemplate('edit.php', true)->render([
+            'entry' => new SiteNews\Entry(),
+            'config' => SiteNews\Config::Get(),
+        ]);
     }
 
     public function edit_action($id)
@@ -97,9 +98,11 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
 
         $this->setPageTitle($this->_('Eintrag bearbeiten'));
 
-        $template = $this->getTemplate('edit.php', true);
-        $template->entry = SiteNews\Entry::find($id);
-        echo $template->render();
+        echo $this->getTemplate('edit.php', true)->render([
+            'entry'  => SiteNews\Entry::find($id),
+            'config' => SiteNews\Config::Get(),
+            'group'  => $this->group,
+        ]);
     }
 
     public function store_action($id = null)
@@ -112,18 +115,16 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new InvalidMethodException();
         }
 
-        $visibility = Request::optionArray('visibility');
-
         $entry = new SiteNews\Entry($id);
-        $entry->subject    = Request::get('subject');
-        $entry->content    = Request::get('content');
-        $entry->user_id    = $GLOBALS['user']->id;
-        $entry->visibility = implode(',', $visibility);
-        $entry->expires    = strtotime(Request::get('expires') . ' 23:59:59');
+        $entry->expires = strtotime(Request::get('expires') . ' 23:59:59');
+        $entry->subject = Request::i18n('subject');
+        $entry->content = Request::i18n('content');
+        $entry->user_id = $GLOBALS['user']->id;
+        $entry->groups  = SiteNews\Group::findMany(Request::getArray('groups'));
         $entry->store();
 
         PageLayout::postSuccess($this->_('Der Eintrag wurde gespeichert.'));
-        header('Location: ' . URLHelper::getLink('dispatch.php/start'));
+        $this->redirect("dispatch.php/start?group={$this->group}");
     }
 
     public function visit_action($id)
@@ -134,10 +135,9 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         }
 
         if (Request::isXhr()) {
-            header('Content-Type: application/json');
-            echo json_encode(true);
+            $this->render_json(true);
         } else {
-            header('Location: ' . URLHelper::getLink('dispatch.php/start#sitenews-' . $id));
+            $this->redirect("dispatch.php/start#sitenews-{$id}");
         }
     }
 
@@ -148,13 +148,17 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         }
 
         if (!Request::isPost()) {
-            throw new InvalidMethodException();
+            throw new MethodNotAllowedException();
         }
 
         SiteNews\Entry::find($id)->delete();
 
-        PageLayout::postSuccess($this->_('Der Eintrag wurde gelöscht.'));
-        header('Location: ' . URLHelper::getLink('dispatch.php/start'));
+        if (Request::isXhr()) {
+            $this->render_json(true);
+        } else {
+            PageLayout::postSuccess($this->_('Der Eintrag wurde gelöscht.'));
+            $this->redirect('dispatch.php/start');
+        }
     }
 
     public function content_action($perm)
@@ -166,99 +170,62 @@ class SiteNewsWidget extends StudIPPlugin implements PortalPlugin
         echo $this->getContent($perm);
     }
 
-    protected function getTemplate($template, $layout = false)
+    public function config_action()
     {
+        if (!$this->is_root) {
+            throw new AccessDeniedException();
+        }
+
+        if (Request::isPost()) {
+            SiteNews\Config::setTitle(Request::i18n('title'));
+
+            foreach (Request::getArray('groups') as $id => $data) {
+                $group = (is_numeric($id) && $id < 0)
+                       ? new SiteNews\Group()
+                       : SiteNews\Group::find($id);
+                $group->id       = $data['id'];
+                $group->name     = Request::i18n("groups_{$id}_name");
+                $group->position = (int) $data['position'];
+                $group->store();
+
+                $group->setRoles($data['roles']);
+            }
+
+            PageLayout::postSuccess($this->_('Die Einstellungen wurden gespeichert.'));
+            $this->redirect('dispatch.php/start');
+        }
+
+        $this->setPageTitle($this->_('Einstellungen'));
+
+        $template = $this->getTemplate('config.php', true);
+        $template->title = SiteNews\Config::getTitle();
+        $template->roles = RolePersistence::getAllRoles();
+        $template->groups = SiteNews\Group::findAll();
+        echo $template->render();
+    }
+
+    public function delete_group_action()
+    {
+        if (!$this->is_root) {
+            throw new AccessDeniedException();
+        }
+
+        if (!Request::isPost()) {
+            throw new MethodNotAllowedException();
+        }
+
+        $id = Request::option('id');
+        if (!$id) {
+            throw new RuntimeException('No id');
+        }
+
+        SiteNews\Group::find($id)->delete();
+
         if (Request::isXhr()) {
-            header('X-Initialize-Dialog: true');
-        }
-
-        $factory  = new Flexi_TemplateFactory(__DIR__ . '/views');
-        $template = $factory->open($template);
-        $template->controller = $this;
-        if ($layout && !Request::isXhr()) {
-            $template->set_layout($GLOBALS['template_factory']->open('layouts/base.php'));
-        }
-        $template->_ = function ($string) {
-            return $this->_($string);
-        };
-        return $template;
-    }
-
-    public function setPageTitle($title)
-    {
-        $args = array_slice(func_get_args(), 1);
-        $title = vsprintf($title, $args);
-        PageLayout::setTitle($title);
-    }
-
-    public function url_for($to)
-    {
-        $arguments = func_get_args();
-        $last = end($arguments);
-        if (is_array($last)) {
-            $params = array_pop($arguments);
+            $this->render_json(true);
         } else {
-            $params = [];
+            PageLayout::postSuccess($this->_('Die Gruppe wurde gelöscht.'));
+            $this->redirect('dispatch.php/start');
         }
-
-        $path = implode('/', $arguments);
-
-        return PluginEngine::getURL($this, $params, $path);
-    }
-
-    /**
-     * Plugin localization for a single string.
-     * This method supports sprintf()-like execution if you pass additional
-     * parameters.
-     *
-     * @param String $string String to translate
-     * @return translated string
-     */
-    public function _($string)
-    {
-        $result = static::GETTEXT_DOMAIN === null
-                ? $string
-                : dcgettext(static::GETTEXT_DOMAIN, $string, LC_MESSAGES);
-        if ($result === $string) {
-            $result = _($string);
-        }
-
-        if (func_num_args() > 1) {
-            $arguments = array_slice(func_get_args(), 1);
-            $result = vsprintf($result, $arguments);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Plugin localization for plural strings.
-     * This method supports sprintf()-like execution if you pass additional
-     * parameters.
-     *
-     * @param String $string0 String to translate (singular)
-     * @param String $string1 String to translate (plural)
-     * @param mixed  $n       Quantity factor (may be an array or array-like)
-     * @return translated string
-     */
-    public function _n($string0, $string1, $n)
-    {
-        if (is_array($n)) {
-            $n = count($n);
-        }
-
-        $result = static::GETTEXT_DOMAIN === null
-                ? $string0
-                : dngettext(static::GETTEXT_DOMAIN, $string0, $string1, $n);
-        if ($result === $string0 || $result === $string1) {
-            $result = ngettext($string0, $string1, $n);
-        }
-
-        if (func_num_args() > 3) {
-            $arguments = array_slice(func_get_args(), 3);
-            $result = vsprintf($result, $arguments);
-        }
-
-        return $result;
     }
 }
