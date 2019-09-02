@@ -1,39 +1,49 @@
-<form action="<?= $controller->url_for("store/{$entry->id}") ?>" method="post" class="sitenews-editor default">
+<form action="<?= $controller->link_for("store/{$entry->id}", compact('group')) ?>" method="post" class="sitenews-editor default">
     <fieldset>
-        <legend class="hide-in-dialog"><?= $_('Inhalte bearbeiten') ?></legend>
+        <legend><?= $_('Inhalte bearbeiten') ?></legend>
 
-        <fieldset class="multi-checkbox-required">
-            <label for="visibility"><?= $_('Sichtbar für') ?></label>
-        <? foreach ($controller->config as $status => $config): ?>
-            <label>
-                <input type="checkbox" name="visibility[]" value="<?= htmlReady($status) ?>" <? if ($entry->isVisibleForPerm($status)) echo 'checked'; ?>>
-                <?= htmlReady($config['label']) ?>
-            <? if ($status === 'autor'): ?>
-                <?= tooltipIcon($_('Gäste können nicht einzeln angesprochen werden. Die Einträge sind immer auch für Studenten sichtbar.')) ?>
-            <? endif; ?>
-            </label>
-        <? endforeach; ?>
-        </fieldset>
+        <label>
+            <?= $_('Anzeigen bis') ?>
+            <input type="text" name="expires" data-date-picker
+                   value="<?= strftime('%x', $entry->expires ?: time()) ?>">
+        </label>
 
-        <fieldset>
-            <label for="expires"><?= $_('Anzeigen bis') ?></label>
-            <input type="text" name="expires" class="has-datepicker" value="<?= date('d.m.Y', $entry->expires ?: time()) ?>">
-        </fieldset>
+        <label>
+            <?= $_('Titel') ?>
+            <?= I18N::input('subject', $entry->subject, [
+                'required'    => '',
+                'placeholder' => $_('Titel des Eintrags'),
+            ]) ?>
+        </label>
 
-        <fieldset>
-            <label for="subject"><?= $_('Titel') ?></label>
-            <input required type="text" name="subject" id="subject" value="<?= htmlReady($entry->subject) ?>" placeholder="<?= $_('Titel des Eintrags') ?>">
-        </fieldset>
-
-        <fieldset>
-            <label for="content"><?= $_('Inhalt') ?></label>
-            <textarea required name="content" id="content" class="add_toolbar" data-secure placeholder="<?= $_('Inhalt des Eintrags') ?>"><?= htmlReady($entry->content) ?></textarea>
-        </fieldset>
-
+        <label>
+            <?= $_('Inhalt') ?>
+            <?= I18N::textarea('content', $entry->content, [
+                'required' => '',
+                'data-secure' => '',
+                'class' => 'add_toolbar',
+                'placeholder' => $_('Inhalt des Eintrags'),
+            ]) ?>
+        </label>
     </fieldset>
 
-    <div data-dialog-button>
+    <fieldset class="multi-checkbox-required">
+        <legend><?= $_('Sichtbar für') ?></legend>
+
+    <? foreach ($config as $group => $label): ?>
+        <label>
+            <input type="checkbox" name="groups[]" value="<?= htmlReady($group) ?>"
+                   <? if ($entry->groups->find($group)) echo 'checked'; ?>>
+            <?= htmlReady($label) ?>
+        </label>
+    <? endforeach; ?>
+    </fieldset>
+
+    <footer data-dialog-button>
         <?= Studip\Button::createAccept($_('Speichern')) ?>
-        <?= Studip\LinkButton::createCancel($_('Abbrechen'), URLHelper::getLink('dispatch.php/start')) ?>
-    </div>
+        <?= Studip\LinkButton::createCancel(
+            $_('Abbrechen'),
+            URLHelper::getURL('dispatch.php/start')
+        ) ?>
+    </footer>
 </form>

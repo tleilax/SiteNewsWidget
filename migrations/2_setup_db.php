@@ -23,17 +23,17 @@ class SetupDb extends Migration
     public function up()
     {
         $query = "CREATE TABLE IF NOT EXISTS `sitenews_entries` (
-                      `news_id` CHAR(32) NOT NULL,
+                      `news_id` CHAR(32) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
                       `subject` VARCHAR(256) NOT NULL,
                       `content` TEXT NOT NULL,
-                      `user_id` CHAR(32) NOT NULL,
+                      `user_id` CHAR(32) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
                       `visibility` SET('autor', 'tutor', 'dozent', 'admin') NOT NULL,
                       `activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
                       `expires` INT(11) UNSIGNED NOT NULL,
                       `mkdate` INT(11) UNSIGNED NOT NULL,
                       `chdate` INT(11) UNSIGNED NOT NULL,
                       PRIMARY KEY (`news_id`)
-                  )";
+                  ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
         DBManager::get()->exec($query);
 
         SimpleORMap::expireTableScheme();

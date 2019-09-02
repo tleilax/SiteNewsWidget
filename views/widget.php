@@ -1,12 +1,12 @@
-<section class="contentbox sitenews-widget">
+<article class="studip sitenews-widget">
 <? if ($is_root): ?>
-    <nav class="widget-tabs" data-source="<?= $controller->url_for('content/#{perm}') ?>">
+    <nav class="widget-tabs" data-source="<?= $controller->link_for('content/#{group}') ?>">
         <ul>
-        <? foreach ($controller->config as $status => $config): ?>
-            <li <? if ($perm === $status) echo 'class="current"'; ?>>
-                <a href="<?= URLHelper::getLink('?', ['perm' => $status]) ?>" data-perm="<?= htmlReady($status) ?>">
-                    <?= htmlReady($config['label']) ?>
-                    (<?= SiteNews\Entry::countByPerm($status, false) ?>)
+        <? foreach ($config as $g => $label): ?>
+            <li <? if ($group === $g) echo 'class="current"'; ?>>
+                <a href="<?= URLHelper::getLink('?', ['group' => $g]) ?>" data-group="<?= htmlReady($g) ?>">
+                    <?= htmlReady($label) ?>
+                    (<?= SiteNews\Entry::countByGroup($g, false) ?>)
                 </a>
             </li>
         <? endforeach; ?>
@@ -14,7 +14,7 @@
     </nav>
 <? endif; ?>
 <? foreach ($entries as $entry): ?>
-    <article <? if ($entry->is_new): ?>class="new"<? endif; ?> data-visiturl="<?= $controller->url_for('visit/' . $entry->id) ?>" id="sitenews-<?= htmlReady($entry->id) ?>" data-active="<?= json_encode($entry->is_active) ?>">
+    <article class="studip toggle <? if ($entry->is_new): ?>new<? endif; ?>" data-visiturl="<?= $controller->url_for("visit/{$entry->id}") ?>" id="sitenews-<?= htmlReady($entry->id) ?>" data-active="<?= json_encode($entry->is_active) ?>">
         <header>
             <h1>
                 <a href="#">
@@ -23,6 +23,7 @@
             </h1>
             <nav>
             <? if ($entry->author !== null): ?>
+
                 <a href="<?= URLHelper::getLink('dispatch.php/profile?username=' . $entry->author->username) ?>">
                     <?= Avatar::getAvatar($entry->author->id)->getImageTag(Avatar::SMALL) ?>
                     <?= htmlReady($entry->author->getFullname()) ?>
@@ -39,18 +40,22 @@
                 </span>
                 <span style="color: #050;"><?= $entry->views ?></span>
             <? if ($is_root): ?>
-                <a href="<?= $controller->url_for('edit', $entry->id) ?>" data-dialog>
-                    <?= Icon::create('edit', 'clickable', tooltip2($_('Eintrag bearbeiten')))?>
+                <a href="<?= $controller->link_for('edit', $entry->id, ['group' => $g]) ?>" data-dialog>
+                    <?= Icon::create('edit')->asImg(tooltip2($_('Eintrag bearbeiten')))?>
                 </a>
-                <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post"
+                <form action="<?= $controller->link_for('delete', $entry->id) ?>" method="post"
                     data-confirm="<?= $_('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
-                    <?= Icon::create('trash', 'clickable', array_merge(tooltip2($_('Eintrag löschen')), ['align' => 'middle']))->asInput() ?>
+                    <?= Icon::create('trash')->asInput(tooltip2($_('Eintrag löschen')) + [
+                        'style' => 'vertical-align: middle',
+                    ]) ?>
                 </form>
             <? endif; ?>
             </nav>
         </header>
         <section>
-            <?= formatReady($entry->content) ?>
+            <article>
+                <?= formatReady($entry->content) ?>
+            </article>
         </section>
     </article>
 <? endforeach; ?>

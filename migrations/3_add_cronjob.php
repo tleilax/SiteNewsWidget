@@ -45,7 +45,6 @@ class AddCronjob extends Migration
      */
     private function getCronjobFilename()
     {
-        return str_replace($GLOBALS['STUDIP_BASE_PATH'] . '/', '',
-                           realpath(__DIR__ . '/../classes/Cronjob.php'));
+        return studip_relative_oath(realpath(__DIR__ . '/../classes/Cronjob.php'));
     }
 }

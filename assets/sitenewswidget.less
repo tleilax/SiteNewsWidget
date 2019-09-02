@@ -6,12 +6,14 @@
     textarea {
         height: 200px;
     }
-    label:not([for]) {
+    .multi-checkbox-required label:not([for]) {
         display: inline-block;
     }
 }
 .sitenews-widget {
     .widget-tabs {
+        margin: -10px -10px 10px;
+
         ul, li {
             list-style: none;
             margin: 0;
@@ -45,6 +47,10 @@
         }
     }
 
+    article.studip header > nav > * {
+        max-height: none;
+    }
+
     [data-active="false"] {
         .transition(opacity 300ms);
 
@@ -74,4 +80,45 @@ a.sitenews-active-toggle[data-show-inactive="false"] {
     .background-icon('checkbox-checked', 'clickable');
     background-position: top left;
     background-repeat: no-repeat;
+}
+
+table.group-administration{
+    &:not(.ui-sortable) {
+        thead th:first-child,
+        tbody td:first-child {
+            display: none;
+        }
+    }
+    td {
+        background-color: @white;
+    }
+    input[type="text"] {
+        max-width: none;
+        width: 100%;
+    }
+    .ui-sortable-helper td {
+        background-color: @white !important;
+    }
+    .placeholder {
+        @gap: 3px;
+
+        position: relative;
+
+        &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: @gap;
+            right: @gap;
+            bottom: @gap;
+            left: @gap;
+            border-radius: 2px;
+            border: 1px dashed @light-gray-color-60;
+        }
+
+        td {
+            background-color: @light-gray-color-20;
+            height: 43px;
+        }
+    }
 }
