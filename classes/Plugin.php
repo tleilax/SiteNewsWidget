@@ -77,7 +77,7 @@ class Plugin extends \StudIPPlugin
         die;
     }
 
-    protected function getPluginVersion()
+    public function getPluginVersion()
     {
         static $manifest = null;
         if ($manifest === null) {
