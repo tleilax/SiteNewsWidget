@@ -97,7 +97,7 @@ class Cronjob extends \CronJob
 
         foreach ($deactivate as $group) {
             echo 'Deactivating for group "' . $group . '"' . PHP_EOL;
-            $this->deactivatePluginForRole($plugin_id, $group);
+            $this->deactivatePluginForGroup($plugin_id, $group);
         }
 
         if (mt_rand() / mt_getrandmax() <= self::GC_PROPABILITY) {
@@ -111,7 +111,7 @@ class Cronjob extends \CronJob
      * @param string $plugin_id Id of the plugin
      * @param string $role_id   If of the role
      */
-    private function activatePluginForRole($plugin_id, $group)
+    private function activatePluginForGroup($plugin_id, $group)
     {
         Group::find($group)->roles->each(function (GroupRole $role) {
             RolePersistence::assignPluginRoles($plugin_id, $role->role_id);
@@ -124,7 +124,7 @@ class Cronjob extends \CronJob
      * @param string $plugin_id Id of the plugin
      * @param string $role_id   If of the role
      */
-    private function deactivatePluginForRole($plugin_id, $group)
+    private function deactivatePluginForGroup($plugin_id, $group)
     {
         Group::find($group)->roles->each(function (GroupRole $role) {
             RolePersistence::deleteAssignedPluginRoles($plugin_id, $role->role_id);
