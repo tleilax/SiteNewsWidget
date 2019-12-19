@@ -135,7 +135,7 @@ class Cronjob extends \CronJob
      * Positions the widget for a certain group.
      *
      * @param string $plugin_id Id of the plugin
-     * @param string $group      The permission
+     * @param string $group      The group
      */
     private function positionWidgetByGroup($plugin_id, $group)
     {
@@ -152,10 +152,7 @@ class Cronjob extends \CronJob
         $reposition_statement = DBManager::get()->prepare($query);
 
         $query = "INSERT INTO `widget_user` (`pluginid`, `position`, `range_id`, `col`)
-                  SELECT DISTINCT :plugin_id, 0, `user_id`, 0
-                  FROM `auth_user_md5`
-                  JOIN `widget_user` ON `auth_user_md5`.`user_id` = `widget_user`.`range_id`
-                  WHERE `perms` = :perm";
+                  VALUES (:plugin_id, 0, :user_id, 0)";
         $add_statement = DBManager::get()->prepare($query);
         $add_statement->bindValue(':plugin_id', $plugin_id);
 

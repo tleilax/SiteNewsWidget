@@ -17,7 +17,7 @@ class Group extends \SimpleORMap
             'on_store'          => 'store',
         ];
         $config['has_and_belongs_to_many']['entries'] = [
-            'class_name' => Entry::class,
+            'class_name'     => Entry::class,
             'thru_table'     => 'sitenews_entries_groups',
             'thru_key'       => 'group_id',
             'thru_assoc_key' => 'news_id',
