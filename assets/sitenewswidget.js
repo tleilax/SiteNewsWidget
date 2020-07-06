@@ -20,10 +20,9 @@
         var source_url = $(this).closest('.widget-tabs').data().source;
         var group      = $(this).data().group;
         var url        = xprintf(source_url, {group: group});
-        var timeout;
 
-        timeout = setTimeout(function () {
-            STUDIP.Overlay.show(true, '.sitenews-widget');
+        var timeout = setTimeout(function () {
+            STUDIP.Overlay.show(true);
         }, 200);
 
         $(this).closest('.sitenews-widget').parent().load(url, function () {
@@ -82,13 +81,7 @@
         return false;
     });
 
-    $(document).ready(function () {
-        $(document).trigger('studip-ready');
-    }).on('dialog-update', function () {
-        $(document).trigger('studip-ready');
-    });
-
-    $(document).on('studip-ready', function () {
+    STUDIP.ready(function () {
         $('table.group-administration:not(.ui-sortable)').sortable({
             axis: 'y',
             containment: 'parent',
