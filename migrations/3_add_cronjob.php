@@ -7,6 +7,13 @@
  */
 class AddCronjob extends Migration
 {
+    public function __construct($verbose = false)
+    {
+        parent::__construct($verbose);
+
+        require_once __DIR__ . '/../classes/Cronjob.php';
+    }
+
     /**
      * Returns the description of the migration.
      *
@@ -22,7 +29,7 @@ class AddCronjob extends Migration
      */
     public function up()
     {
-        $task_id = CronjobScheduler::registerTask($this->getCronjobFilename());
+        $task_id = CronjobScheduler::registerTask(new SiteNews\Cronjob());
         $schedule = CronjobScheduler::schedulePeriodic($task_id);
 
         $schedule->active = true;
@@ -34,17 +41,7 @@ class AddCronjob extends Migration
      */
     public function down()
     {
-        $task_id = CronjobTask::findByFilename($this->getCronjobFilename())->task_id;
+        $task_id = CronjobTask::findOneByClass(SiteNews\Cronjob::class)->task_id;
         CronjobScheduler::unregisterTask($task_id);
-    }
-
-    /**
-     * Returns the relative path to the cronjob.
-     *
-     * @return String containing the relative path
-     */
-    private function getCronjobFilename()
-    {
-        return studip_relative_oath(realpath(__DIR__ . '/../classes/Cronjob.php'));
     }
 }
