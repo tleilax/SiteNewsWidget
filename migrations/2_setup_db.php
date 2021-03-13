@@ -35,8 +35,6 @@ class SetupDb extends Migration
                       PRIMARY KEY (`news_id`)
                   ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC";
         DBManager::get()->exec($query);
-
-        SimpleORMap::expireTableScheme();
     }
 
     /**

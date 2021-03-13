@@ -61,8 +61,6 @@ class ResurrectTitleAndConfigurableSections extends Migration
         $query = "ALTER TABLE `sitenews_entries`
                   DROP COLUMN `visibility`";
         DBManager::get()->exec($query);
-
-        SimpleORMap::expireTableScheme();
     }
 
     public function down()
@@ -78,7 +76,5 @@ class ResurrectTitleAndConfigurableSections extends Migration
         $query = "ALTER TABLE `sitenews_entries`
                   ADD COLUMN `visibility` SET('autor', 'tutor', 'dozent', 'admin') CHARACTER SET latin1 COLLATE latin1_bin AFTER `user_id`";
         DBManager::get()->exec($query);
-
-        SimpleORMap::expireTableScheme();
     }
 }
