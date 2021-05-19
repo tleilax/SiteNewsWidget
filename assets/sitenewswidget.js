@@ -34,18 +34,24 @@
     });
 
     $(document).on('click', 'a.sitenews-active-toggle', function (event) {
-        var shown = !$(this).data().showInactive;
-        var role  = shown ? 'checkbox-unchecked' : 'checkbox-checked';
+        const link = $(this).attr('href');
 
-        $(this).data('show-inactive', shown)
-            .find('img')
-            .attr('src', STUDIP.ASSETS_URL + 'images/icons/blue/' + role + '.svg');
+        $.post(link).done(shown => {
+            const widget = $(this).closest('.studip-widget').find('.sitenews-widget');
+            const role = shown ? 'checkbox-unchecked' : 'checkbox-checked';
+
+            $(this).data('show-inactive', shown)
+                .find('img')
+                .attr('src', STUDIP.ASSETS_URL + 'images/icons/blue/' + role + '.svg');
 
 
-        $(this).closest('.studip-widget').find('[data-active="false"]').toggle(shown);
+            widget.find('[data-active="false"]').toggle(shown);
 
-        event.stopPropagation();
-        event.preventDefault();
+            const visibleEntries = widget.find('article.studip:visible').length;
+            $('.no-entries', widget).toggle(visibleEntries === 0);
+        });
+
+        return false;
     });
 
     var new_counter = 1;

@@ -1,3 +1,11 @@
+<?php
+    $visible = count(array_filter(
+        $entries,
+        function ($entry) use ($show_inactive) {
+            return $show_inactive || $entry->is_active;
+        }
+    ));
+?>
 <article class="studip sitenews-widget">
 <? if ($is_root): ?>
     <nav class="widget-tabs" data-source="<?= $controller->link_for('content/#{group}') ?>">
@@ -14,7 +22,7 @@
     </nav>
 <? endif; ?>
 <? foreach ($entries as $entry): ?>
-    <article class="studip toggle <? if ($entry->is_new): ?>new<? endif; ?>" data-visiturl="<?= $controller->url_for("visit/{$entry->id}") ?>" id="sitenews-<?= htmlReady($entry->id) ?>" data-active="<?= json_encode($entry->is_active) ?>">
+    <article class="studip toggle <? if ($entry->is_new): ?>new<? endif; ?>" data-visiturl="<?= $controller->url_for("visit/{$entry->id}") ?>" id="sitenews-<?= htmlReady($entry->id) ?>" data-active="<?= json_encode($entry->is_active) ?>" <? if (!$show_inactive && !$entry->is_active) echo 'style="display: none;"'; ?>>
         <header>
             <h1>
                 <a href="#">
@@ -59,9 +67,7 @@
         </section>
     </article>
 <? endforeach; ?>
-<? if (!$entries): ?>
-    <section>
+    <section class="no-entries" <? if ($entries && $visible > 0) echo 'style="display: none"'; ?>>
         <?= $_('Es sind keine Einträge vorhanden') ?>
     </section>
-<? endif; ?>
 </section>

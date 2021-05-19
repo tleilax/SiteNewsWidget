@@ -18,7 +18,7 @@ class Plugin extends \StudIPPlugin
 
         if (!$this->injected) {
             $this->addStylesheet('assets/sitenewswidget.less');
-            PageLayout::addScript($this->getPluginURL() . '/assets/sitenewswidget.js?v=' . $this->getPluginVersion());
+            $this->addScript('assets/sitenewswidget.js');
 
             $this->injected = true;
         }
@@ -64,7 +64,7 @@ class Plugin extends \StudIPPlugin
 
     public function render_json($what)
     {
-        header('Content-Type: application/json');
+        header('Content-Type: application/json;charset=utf-8');
         echo json_encode($what);
     }
 
@@ -75,14 +75,5 @@ class Plugin extends \StudIPPlugin
         $url = call_user_func_array('URLHelper::getURL', func_get_args());
         header("Location: {$url}");
         die;
-    }
-
-    public function getPluginVersion()
-    {
-        static $manifest = null;
-        if ($manifest === null) {
-            $manifest = $this->getMetadata();
-        }
-        return $manifest['version'];
     }
 }

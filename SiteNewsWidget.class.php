@@ -51,10 +51,11 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
             $nav->setImage(Icon::create('add'), tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
 
-            $nav = new Navigation('', '#');
-            $nav->setImage(Icon::create('checkbox-unchecked'), tooltip2($this->_('Inaktive Einträge ausblenden')) + [
+            $show_inactive = $GLOBALS['user']->cfg->SITE_NEWS_WIDGET_SHOW_INACTIVE;
+            $nav = new Navigation('', $this->url_for('toggle'));
+            $nav->setImage(Icon::create($show_inactive ? 'checkbox-unchecked' : 'checkbox-checked'), tooltip2($this->_('Inaktive Einträge ausblenden')) + [
                 'class'              => 'sitenews-active-toggle',
-                'data-show-inactive' => json_encode(true),
+                'data-show-inactive' => json_encode($show_inactive),
             ]);
             $navigation[] = $nav;
 
@@ -69,10 +70,11 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
     protected function getContent($group)
     {
         return $this->getTemplate('widget.php')->render([
-            'is_root' => $this->is_root,
-            'entries' => SiteNews\Entry::findByGroup($group, !$this->is_root),
-            'group'   => $group,
-            'config'  => SiteNews\Config::Get(),
+            'is_root'       => $this->is_root,
+            'entries'       => SiteNews\Entry::findByGroup($group, !$this->is_root),
+            'group'         => $group,
+            'config'        => SiteNews\Config::Get(),
+            'show_inactive' => $GLOBALS['user']->cfg->SITE_NEWS_WIDGET_SHOW_INACTIVE,
         ]);
     }
 
@@ -227,5 +229,23 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
             PageLayout::postSuccess($this->_('Die Gruppe wurde gelöscht.'));
             $this->redirect('dispatch.php/start');
         }
+    }
+
+    public function toggle_action()
+    {
+        if (!$this->is_root) {
+            throw new AccessDeniedException();
+        }
+
+        if (!Request::isPost()) {
+            throw new MethodNotAllowedException();
+        }
+
+        $GLOBALS['user']->cfg->store(
+            'SITE_NEWS_WIDGET_SHOW_INACTIVE',
+            !$GLOBALS['user']->cfg->SITE_NEWS_WIDGET_SHOW_INACTIVE
+        );
+
+        $this->render_json($GLOBALS['user']->cfg->SITE_NEWS_WIDGET_SHOW_INACTIVE);
     }
 }
