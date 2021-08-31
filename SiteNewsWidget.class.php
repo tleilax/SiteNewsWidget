@@ -120,7 +120,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         $entry = new SiteNews\Entry($id);
         $entry->expires = strtotime(Request::get('expires') . ' 23:59:59');
         $entry->subject = Request::i18n('subject');
-        $entry->content = Request::i18n('content');
+        $entry->content = Studip\Markup::purifyHtml(Request::i18n('content'));
         $entry->user_id = $GLOBALS['user']->id;
         $entry->groups  = SiteNews\Group::findMany(Request::getArray('groups'));
         $entry->store();

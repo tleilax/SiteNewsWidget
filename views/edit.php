@@ -21,7 +21,7 @@
             <?= I18N::textarea('content', $entry->content, [
                 'required' => '',
                 'data-secure' => '',
-                'class' => 'add_toolbar',
+                'class' => 'add_toolbar wysiwyg',
                 'placeholder' => $_('Inhalt des Eintrags'),
             ]) ?>
         </label>
