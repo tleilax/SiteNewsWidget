@@ -2,5 +2,5 @@ pluginname=Site News Widget
 description=Startseiten für Stud.IP-Neuigkeiten am Standort
 pluginclassname=SiteNewsWidget
 origin=UOL
-version=2.6
+version=2.7
 studipMinVersion=4.5
