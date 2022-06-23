@@ -11,12 +11,7 @@ use SiteNewsWidget;
  */
 final class Config
 {
-    /**
-     * Return the config for the widget.
-     *
-     * @return Array containing the configuration
-     */
-    public static function Get()
+    public static function Get(): array
     {
         $config = [];
         foreach (Group::findAll() as $group) {
@@ -25,7 +20,7 @@ final class Config
         return $config;
     }
 
-    public static function getTitle()
+    public static function getTitle(): \I18NString
     {
         $title = \Config::get()->SITE_NEWS_WIDGET_TITLE;
         return new \I18NString($title, null, [
@@ -35,7 +30,7 @@ final class Config
         ]);
     }
 
-    public static function setTitle(\I18NString $title)
+    public static function setTitle(\I18NString $title): void
     {
         \Config::get()->store('SITE_NEWS_WIDGET_TITLE', $title->original());
 

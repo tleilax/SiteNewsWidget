@@ -2,8 +2,16 @@
 namespace SiteNews;
 
 use DBManager;
-use PDO;
 
+/**
+ * @property string $id
+ * @property string $group_id
+ * @property \I18NString $name
+ * @property int $position
+ *
+ * @property GroupRole[]|\SimpleCollection $roles
+ * @property Entry[] $entries
+ */
 class Group extends \SimpleORMap
 {
     protected static function configure($config = [])
@@ -30,7 +38,7 @@ class Group extends \SimpleORMap
         $config['registered_callbacks']['before_create'][] = function (Group $group) {
             if (!$group->position) {
                 $query = "SELECT MAX(`position`) FROM `sitenews_groups`";
-                $group->position = 1 + DBManager::get()->fetchColumn($query);
+                $group->position = 1 + (int) DBManager::get()->fetchColumn($query);
             }
         };
 
