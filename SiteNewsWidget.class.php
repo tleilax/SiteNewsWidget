@@ -9,18 +9,12 @@ require_once __DIR__ . '/bootstrap.php';
  */
 class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
 {
-    use SiteNews\PluginLocalizationTrait;
-
-    const GETTEXT_DOMAIN = 'site-news';
-
     public $config;
     protected $is_root;
 
     public function __construct()
     {
         parent::__construct();
-
-        $this->initializeLocalization(static::GETTEXT_DOMAIN);
 
         $this->is_root = $GLOBALS['perm']->have_perm('root');
         $this->group   = $this->is_root

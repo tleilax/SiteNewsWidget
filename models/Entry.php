@@ -6,6 +6,23 @@ namespace SiteNews;
  *
  * @author  Jan-Hendrik Willms <tleilax+studip@gmail.com>
  * @license GPL2 or any later version
+ *
+ * @property string $id
+ * @property string $news_id
+ * @property \I18NString $subject
+ * @property \I18NString $content
+ * @property string $user_id
+ * @property bool $activated
+ * @property int $expires
+ * @property int $mkdate
+ * @property int $chdate
+ *
+ * @property \User $author
+ * @property Group[] $groups
+ *
+ * @property bool $is_new
+ * @property bool $is_active
+ * @property int $views
  */
 class Entry extends \SimpleORMap
 {

@@ -63,7 +63,7 @@ class Cronjob extends \CronJob
     {
         $info = PluginManager::getInstance()->getPluginInfo('SiteNewsWidget');
         if (!$info) {
-            return false;
+            return;
         }
 
         $plugin_id = $info['id'];
@@ -113,7 +113,7 @@ class Cronjob extends \CronJob
      */
     private function activatePluginForGroup($plugin_id, $group)
     {
-        Group::find($group)->roles->each(function (GroupRole $role) {
+        Group::find($group)->roles->each(function (GroupRole $role) use ($plugin_id) {
             RolePersistence::assignPluginRoles($plugin_id, $role->role_id);
         });
     }
@@ -126,7 +126,7 @@ class Cronjob extends \CronJob
      */
     private function deactivatePluginForGroup($plugin_id, $group)
     {
-        Group::find($group)->roles->each(function (GroupRole $role) {
+        Group::find($group)->roles->each(function (GroupRole $role) use ($plugin_id) {
             RolePersistence::deleteAssignedPluginRoles($plugin_id, $role->role_id);
         });
     }
@@ -185,7 +185,7 @@ class Cronjob extends \CronJob
                   FROM `widget_user`
                   WHERE `range_id` = :user_id
                     AND `col` = 0
-                  ORDER BY `position` ASC";
+                  ORDER BY `position`";
         $ids_statement = DBManager::get()->prepare($query);
 
         $query = "UPDATE `widget_user`
