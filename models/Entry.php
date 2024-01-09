@@ -18,7 +18,7 @@ namespace SiteNews;
  * @property int $chdate
  *
  * @property \User $author
- * @property Group[] $groups
+ * @property Group[]|\SimpleORMapCollection $groups
  *
  * @property bool $is_new
  * @property bool $is_active
@@ -38,50 +38,63 @@ class Entry extends \SimpleORMap
     public static function configure($config = [])
     {
         $config['db_table'] = 'sitenews_entries';
-        $config['has_one']['author'] = [
-            'class_name'        => \User::class,
-            'assoc_foreign_key' => 'user_id',
-            'foreign_key'       => 'user_id',
+
+        $config['has_one'] = [
+            'author' => [
+                'class_name'        => \User::class,
+                'assoc_foreign_key' => 'user_id',
+                'foreign_key'       => 'user_id',
+            ],
         ];
-        $config['has_and_belongs_to_many']['groups'] = [
-            'class_name'     => Group::class,
-            'thru_table'     => 'sitenews_entries_groups',
-            'thru_key'       => 'news_id',
-            'thru_assoc_key' => 'group_id',
-            'on_delete'      => 'delete',
-            'on_store'       => 'store',
+        $config['has_and_belongs_to_many'] = [
+            'groups' => [
+                'class_name'     => Group::class,
+                'thru_table'     => 'sitenews_entries_groups',
+                'thru_key'       => 'news_id',
+                'thru_assoc_key' => 'group_id',
+                'on_delete'      => 'delete',
+                'on_store'       => 'store',
+            ],
         ];
-        $config['additional_fields']['is_new'] = [
-            'get' => function (Entry $entry) {
-                $visit = object_get_visit($entry->id, 'news', '', '', $GLOBALS['user']->id);
-                return !$visit || $visit < $entry->mkdate;
-            },
-            'set' => function (Entry $entry, $field, $value) {
-                object_set_visit($entry->id, 'news', $GLOBALS['user']->id);
-                object_add_view($entry->id);
-            },
-        ];
-        $config['additional_fields']['is_active'] = [
-            'get' => function (Entry $entry) {
-                return $entry->activated
-                    && $entry->expires >= time();
-            },
-            'set' => false,
-        ];
-        $config['additional_fields']['views'] = [
-            'get' => function (Entry $entry) {
-                return object_return_views($entry->id);
-            },
-            'set' => false,
+        $config['additional_fields'] = [
+            'is_new' => [
+                'get' => function (Entry $entry) {
+                    $visit = object_get_visit($entry->id, 'news', '', '', $GLOBALS['user']->id);
+                    return !$visit || $visit < $entry->mkdate;
+                },
+                'set' => function (Entry $entry) {
+                    object_set_visit($entry->id, 'news', $GLOBALS['user']->id);
+                    object_add_view($entry->id);
+                },
+            ],
+            'is_active' => [
+                'get' => function (Entry $entry) {
+                    return $entry->activated
+                        && $entry->expires >= time();
+                },
+                'set' => false,
+            ],
+            'views' => [
+                'get' => function (Entry $entry) {
+                    return object_return_views($entry->id);
+                },
+                'set' => false,
+            ],
         ];
 
-        $config['registered_callbacks']['after_delete'][] = function ($item) {
-            object_kill_visits(false, $item->id);
-            object_kill_views($item->id);
-        };
+        $config['registered_callbacks'] = [
+            'after_delete' => [
+                function ($item) {
+                    object_kill_visits(false, $item->id);
+                    object_kill_views($item->id);
+                },
+            ],
+        ];
 
-        $config['i18n_fields']['subject'] = true;
-        $config['i18n_fields']['content'] = true;
+        $config['i18n_fields'] = [
+            'subject' => true,
+            'content' => true,
+        ];
 
         parent::configure($config);
     }
@@ -90,15 +103,13 @@ class Entry extends \SimpleORMap
      * Finds a set of entries by group (and optionally by visible state).
      * Entries are visible when they are not yet expired.
      *
-     * @param string $group        Group/roles to get entries for
-     * @param bool   $only_visible Show only visible / not expired entries
-     *                             (optional, defaults to true)
+     * @param string|null $group        Group/roles to get entries for
+     * @param bool        $only_visible Show only visible / not expired entries
+     *                                  (optional, defaults to true)
      * @return array of matching entries
      */
-    public static function findByGroup($group, $only_visible = true)
+    public static function findByGroup(?string $group, bool $only_visible = true): array
     {
-        $parameters = [];
-
         if ($group === null) {
             $condition = "JOIN `sitenews_entries_groups` USING (`news_id`)
                           JOIN `sitenews_groups_roles` USING (`group_id`)
@@ -115,7 +126,7 @@ class Entry extends \SimpleORMap
                           WHERE `roles_user`.`userid` IS NOT NULL
                             OR `auth_user_md5`.`user_id` IS NOT NULL";
             $parameters = [
-                ':user_id'  => $GLOBALS['user']->id,
+                ':user_id'  => \User::findCurrent()->id,
             ];
         } else {
             $condition = "JOIN `sitenews_entries_groups` USING (`news_id`)
@@ -139,7 +150,7 @@ class Entry extends \SimpleORMap
      *                           (optional, defaults to true)
      * @return int Number of found entries
      */
-    public static function countByGroup($group, $only_visible = true)
+    public static function countByGroup(string $group, bool $only_visible = true): int
     {
         $condition = "JOIN `sitenews_entries_groups` USING (`news_id`)
                       WHERE `group_id`= ?";
@@ -147,18 +158,5 @@ class Entry extends \SimpleORMap
             $condition .= ' AND expires > UNIX_TIMESTAMP()';
         }
         return self::countBySQL($condition, [$group]);
-    }
-
-    /**
-     * Returns whether the entry is visible for the given permission.
-     *
-     * @param string $perm Neccessary permission to view the entry (either
-     *                     autor, tutor, dozent or admin)
-     * @return bool indicating whether the entry is visible
-     */
-    public function isVisibleForPerm($perm)
-    {
-        $visibility = explode(',', $this->visibility);
-        return in_array($perm, $visibility);
     }
 }

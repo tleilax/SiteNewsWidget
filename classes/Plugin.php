@@ -6,18 +6,18 @@ use PageLayout;
 use PluginEngine;
 use Request;
 
-class Plugin extends \StudIPPlugin
+abstract class Plugin extends \StudIPPlugin
 {
     protected $injected = false;
 
-    protected function getTemplate($template, $layout = false)
+    protected function getTemplate(string $template, bool $layout = false): \Flexi_Template
     {
         if (Request::isXhr()) {
             header('X-Initialize-Dialog: true');
         }
 
         if (!$this->injected) {
-            $this->addStylesheet('assets/sitenewswidget.less');
+            $this->addStylesheet('assets/sitenewswidget.scss');
             $this->addScript('assets/sitenewswidget.js');
 
             $this->injected = true;
@@ -29,20 +29,20 @@ class Plugin extends \StudIPPlugin
         if ($layout && !Request::isXhr()) {
             $template->set_layout($GLOBALS['template_factory']->open('layouts/base.php'));
         }
-        $template->_ = function ($string) {
+        $template->_ = function (string $string): string {
             return $this->_($string);
         };
         return $template;
     }
 
-    public function setPageTitle($title)
+    public function setPageTitle(string $title): void
     {
         $args = array_slice(func_get_args(), 1);
         $title = vsprintf($title, $args);
         PageLayout::setTitle($title);
     }
 
-    public function url_for($to)
+    public function url_for($to): string
     {
         $arguments = func_get_args();
         $last = end($arguments);
@@ -57,22 +57,22 @@ class Plugin extends \StudIPPlugin
         return PluginEngine::getURL($this, $params, $path);
     }
 
-    public function link_for($to)
+    public function link_for($to): string
     {
-        return htmlReady(call_user_func_array([$this, 'url_for'], func_get_args()));
+        return htmlReady($this->url_for(...func_get_args()));
     }
 
-    public function render_json($what)
+    public function render_json($what): void
     {
         header('Content-Type: application/json;charset=utf-8');
         echo json_encode($what);
     }
 
-    public function redirect($to)
+    public function redirect(string $to): void
     {
         page_close();
 
-        $url = call_user_func_array('URLHelper::getURL', func_get_args());
+        $url = URLHelper::getURL(...func_get_args());
         header("Location: {$url}");
         die;
     }

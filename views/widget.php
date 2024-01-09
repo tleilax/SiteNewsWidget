@@ -1,4 +1,15 @@
 <?php
+/**
+ * @var SiteNews\Entry[] $entries
+ * @var bool $show_inactive
+ * @var bool $is_root
+ * @var SiteNewsWidget $controller
+ * @var array $config
+ * @var string $group
+ * @var callable $_
+ */
+?>
+<?php
     $visible = count(array_filter(
         $entries,
         function ($entry) use ($show_inactive) {
@@ -70,4 +81,4 @@
     <section class="no-entries" <? if ($entries && $visible > 0) echo 'style="display: none"'; ?>>
         <?= $_('Es sind keine Einträge vorhanden') ?>
     </section>
-</section>
+</article>

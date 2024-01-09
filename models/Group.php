@@ -18,53 +18,64 @@ class Group extends \SimpleORMap
     {
         $config['db_table'] = 'sitenews_groups';
 
-        $config['has_many']['roles'] = [
-            'class_name'        => GroupRole::class,
-            'assoc_foreign_key' => 'group_id',
-            'on_delete'         => 'delete',
-            'on_store'          => 'store',
+        $config['has_many'] = [
+            'roles' => [
+                'class_name'        => GroupRole::class,
+                'assoc_foreign_key' => 'group_id',
+                'on_delete'         => 'delete',
+                'on_store'          => 'store',
+            ],
         ];
-        $config['has_and_belongs_to_many']['entries'] = [
-            'class_name'     => Entry::class,
-            'thru_table'     => 'sitenews_entries_groups',
-            'thru_key'       => 'group_id',
-            'thru_assoc_key' => 'news_id',
-            'on_delete'      => 'delete',
-            'on_store'       => 'store',
+        $config['has_and_belongs_to_many'] = [
+            'entries' => [
+                'class_name'     => Entry::class,
+                'thru_table'     => 'sitenews_entries_groups',
+                'thru_key'       => 'group_id',
+                'thru_assoc_key' => 'news_id',
+                'on_delete'      => 'delete',
+                'on_store'       => 'store',
+            ],
         ];
 
-        $config['i18n_fields']['name'] = true;
+        $config['i18n_fields'] = [
+            'name' => true,
+        ];
 
-        $config['registered_callbacks']['before_create'][] = function (Group $group) {
-            if (!$group->position) {
-                $query = "SELECT MAX(`position`) FROM `sitenews_groups`";
-                $group->position = 1 + (int) DBManager::get()->fetchColumn($query);
-            }
-        };
-
-        $config['registered_callbacks']['before_store'][] = function (Group $group) {
-            if (!$group->isNew() && $group->isFieldDirty('id')) {
-                $group->roles->each(function (GroupRole $role) use ($group) {
-                    $role->group_id = $group->id;
-                    $role->store();
-                });
-            }
-        };
+        $config['registered_callbacks'] = [
+            'before_create' => [
+                function (Group $group) {
+                    if (!$group->position) {
+                        $query = "SELECT MAX(`position`) FROM `sitenews_groups`";
+                        $group->position = 1 + (int) DBManager::get()->fetchColumn($query);
+                    }
+                },
+            ],
+            'before_store' => [
+                function (Group $group) {
+                    if (!$group->isNew() && $group->isFieldDirty('id')) {
+                        $group->roles->each(function (GroupRole $role) use ($group) {
+                            $role->group_id = $group->id;
+                            $role->store();
+                        });
+                    }
+                },
+            ],
+        ];
 
         parent::configure($config);
     }
 
-    public static function findAll()
+    public static function findAll(): array
     {
-        return self::findBySQL('1 ORDER BY position ASC');
+        return self::findBySQL('1 ORDER BY position');
     }
 
-    public static function findFirst()
+    public static function findFirst(): Group
     {
-        return self::findOneBySQL('1 ORDER BY position ASC');
+        return self::findOneBySQL('1 ORDER BY position');
     }
 
-    public function hasRole($id)
+    public function hasRole($id): bool
     {
         if ($id instanceof \Role) {
             $id = $id->getRoleid();
@@ -72,7 +83,7 @@ class Group extends \SimpleORMap
         return $this->roles->findOneBy('role_id', $id) !== null;
     }
 
-    public function setRoles(array $role_ids)
+    public function setRoles(array $role_ids): void
     {
         GroupRole::deleteBySQL('group_id = ?', [$this->id]);
 
@@ -86,7 +97,7 @@ class Group extends \SimpleORMap
         $this->resetRelation('roles');
     }
 
-    public function eachUser(Callable $callback)
+    public function eachUser(callable $callback): array
     {
         $condition = "LEFT JOIN `roles_user` -- Explicit assignment
                         ON `roles_user`.`userid` = `auth_user_md5`.`user_id`
