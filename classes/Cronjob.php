@@ -5,7 +5,6 @@ use DBManager;
 use PDO;
 use PluginManager;
 use RolePersistence;
-use SiteNewsWidget;
 
 /**
  * SiteNewsCronjob.php
@@ -107,11 +106,8 @@ class Cronjob extends \CronJob
 
     /**
      * Activates the widget (which is a plugin) for a certain role.
-     *
-     * @param string $plugin_id Id of the plugin
-     * @param string $role_id   If of the role
      */
-    private function activatePluginForGroup($plugin_id, $group)
+    private function activatePluginForGroup(string $plugin_id, string $group)
     {
         Group::find($group)->roles->each(function (GroupRole $role) use ($plugin_id) {
             RolePersistence::assignPluginRoles($plugin_id, $role->role_id);
@@ -120,11 +116,8 @@ class Cronjob extends \CronJob
 
     /**
      * Deactivates the widget (which is a plugin) for a certain role.
-     *
-     * @param string $plugin_id Id of the plugin
-     * @param string $role_id   If of the role
      */
-    private function deactivatePluginForGroup($plugin_id, $group)
+    private function deactivatePluginForGroup(string $plugin_id, string $group)
     {
         Group::find($group)->roles->each(function (GroupRole $role) use ($plugin_id) {
             RolePersistence::deleteAssignedPluginRoles($plugin_id, $role->role_id);
@@ -137,7 +130,7 @@ class Cronjob extends \CronJob
      * @param string $plugin_id Id of the plugin
      * @param string $group      The group
      */
-    private function positionWidgetByGroup($plugin_id, $group)
+    private function positionWidgetByGroup(string $plugin_id, string $group)
     {
         $query = "DELETE FROM `widget_user`
                   WHERE `pluginid` = :plugin_id

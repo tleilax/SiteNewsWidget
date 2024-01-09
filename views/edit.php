@@ -1,3 +1,12 @@
+<?php
+/**
+ * @var SiteNewsWidget $controller
+ * @var SiteNews\Entry $entry
+ * @var string $group
+ * @var array $config
+ * @var callable $_
+ */
+?>
 <form action="<?= $controller->link_for("store/{$entry->id}", compact('group')) ?>" method="post" class="sitenews-editor default">
     <fieldset>
         <legend><?= $_('Inhalte bearbeiten') ?></legend>

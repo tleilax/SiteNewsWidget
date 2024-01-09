@@ -1,10 +1,8 @@
-/*jslint browser: true, unparam: true */
-/*global jQuery, STUDIP */
 (function ($, STUDIP) {
     'use strict';
 
     function xprintf(str, params) {
-        return str.replace(/#\{([\w-_]+)\}/g, function (chunk, key) {
+        return str.replace(/#\{([\w-_]+)}/g, function (chunk, key) {
             return params.hasOwnProperty(key) ? params[key] : chunk;
         });
     }
@@ -17,15 +15,17 @@
     });
 
     $(document).on('click', '.sitenews-widget .widget-tabs a', function (event) {
-        var source_url = $(this).closest('.widget-tabs').data().source;
-        var group      = $(this).data().group;
-        var url        = xprintf(source_url, {group: group});
+        const source_url = $(this).closest('.widget-tabs').data().source;
+        const group      = $(this).data().group;
+        const url        = xprintf(source_url, {group: group});
+        const containment = $(this).closest('.sitenews-widget').parent();
+        containment.css('position', 'relative');
 
-        var timeout = setTimeout(function () {
-            STUDIP.Overlay.show(true);
+        let timeout = setTimeout(() => {
+            STUDIP.Overlay.show(true, containment);
         }, 200);
 
-        $(this).closest('.sitenews-widget').parent().load(url, function () {
+        $(this).closest('.sitenews-widget').parent().load(url, () => {
             clearTimeout(timeout);
             STUDIP.Overlay.hide();
         });
@@ -33,7 +33,7 @@
         event.preventDefault();
     });
 
-    $(document).on('click', 'a.sitenews-active-toggle', function (event) {
+    $(document).on('click', 'a.sitenews-active-toggle', function () {
         const link = $(this).attr('href');
 
         $.post(link).done(shown => {
@@ -54,12 +54,12 @@
         return false;
     });
 
-    var new_counter = 1;
+    let new_counter = 1;
 
     $(document).on('click', '.group-administration button[name="new-group"]', function () {
-        var table = $(this).closest('table.group-administration');
-        var position = table.find('input[type="hidden"]').last().val();
-        var template = xprintf($('script[type="text/x-template"]#new-group-row').text(), {
+        const table = $(this).closest('table.group-administration');
+        const position = table.find('input[type="hidden"]').last().val();
+        const template = xprintf($('script[type="text/x-template"]#new-group-row').text(), {
             'new-id': -(new_counter++),
             'position': parseInt(position, 10) + 1
         });
@@ -70,33 +70,33 @@
 
         return false;
     }).on('click', '.group-administration .actions input[type="image"]', function () {
-        var question = $(this).data().confirm;
-        STUDIP.Dialog.confirm(question).then(function () {
-            return $.Deferred(function (dfd) {
+        const question = $(this).data().confirm;
+        STUDIP.Dialog.confirm(question).then(() => {
+            return $.Deferred((dfd) => {
                 if ($(this).is('.new-row')) {
                     dfd.resolve();
                 } else {
-                    var url = $(this).attr('formaction');
+                    const url = $(this).attr('formaction');
                     $.post(url).done(dfd.resolve).fail(dfd.reject);
                 }
-            }.bind(this));
-        }.bind(this)).done(function () {
+            });
+        }).done(() => {
             $(this).closest('tr').remove();
-        }.bind(this));
+        });
 
         return false;
     });
 
-    STUDIP.ready(function () {
+    STUDIP.ready(() => {
         $('table.group-administration:not(.ui-sortable)').sortable({
             axis: 'y',
             containment: 'parent',
             cursor: 'ns-resize',
             forcePlaceholderSize: true,
-            helper: function (event, element) {
-                var helper = $(element).clone();
+            helper(event, element) {
+                const helper = $(element).clone();
                 $('td', helper).each(function (index) {
-                    var width = $('td:eq(' + index + ')', element).width();
+                    const width = $('td:eq(' + index + ')', element).width();
                     $(this).width(width);
                 });
                 return helper;
@@ -105,7 +105,7 @@
             items: '> tbody > tr',
             placeholder: 'placeholder',
             tolerance: 'pointer',
-            update: function (event, ui) {
+            update(event, ui) {
                 ui.item.closest('tbody').find('tr').each(function (index) {
                     $('input[type=hidden]', this).val(index + 1);
                 });

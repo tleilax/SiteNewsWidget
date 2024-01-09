@@ -1,3 +1,12 @@
+<?php
+/**
+ * @var SiteNewsWidget $controller
+ * @var callable $_
+ * @var I18NString $title
+ * @var SiteNews\Group[] $groups
+ * @var Role[] $roles
+ */
+?>
 <form action="<?= $controller->link_for('config') ?>" method="post" class="default">
     <fieldset>
         <legend><?= $_('Einstellungen bearbeiten') ?></legend>

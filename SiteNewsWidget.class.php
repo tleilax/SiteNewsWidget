@@ -72,7 +72,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         ]);
     }
 
-    public function add_action()
+    public function add_action(): void
     {
         if (!$this->is_root) {
             throw new AccessDeniedException();
@@ -86,7 +86,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         ]);
     }
 
-    public function edit_action($id)
+    public function edit_action($id): void
     {
         if (!$this->is_root) {
             throw new AccessDeniedException();
@@ -101,7 +101,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         ]);
     }
 
-    public function store_action($id = null)
+    public function store_action($id = null): void
     {
         if (!$this->is_root) {
             throw new AccessDeniedException();
@@ -115,7 +115,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         $entry->expires = strtotime(Request::get('expires') . ' 23:59:59');
         $entry->subject = Request::i18n('subject');
         $entry->content = Studip\Markup::purifyHtml(Request::i18n('content'));
-        $entry->user_id = $GLOBALS['user']->id;
+        $entry->user_id = User::findCurrent()->id;
         $entry->groups  = SiteNews\Group::findMany(Request::getArray('groups'));
         $entry->store();
 
@@ -123,7 +123,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         $this->redirect("dispatch.php/start?group={$this->group}");
     }
 
-    public function visit_action($id)
+    public function visit_action($id): void
     {
         $id = Request::option('sitenews-toggle', $id);
         if ($entry = SiteNews\Entry::find($id)) {
@@ -137,7 +137,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         }
     }
 
-    public function delete_action($id)
+    public function delete_action($id): void
     {
         if (!$this->is_root) {
             throw new AccessDeniedException();
@@ -157,7 +157,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         }
     }
 
-    public function content_action($perm)
+    public function content_action($perm): void
     {
         if (!$this->is_root) {
             throw new AccessDeniedException;
@@ -166,7 +166,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         echo $this->getContent($perm);
     }
 
-    public function config_action()
+    public function config_action(): void
     {
         if (!$this->is_root) {
             throw new AccessDeniedException();
@@ -200,7 +200,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         echo $template->render();
     }
 
-    public function delete_group_action()
+    public function delete_group_action(): void
     {
         if (!$this->is_root) {
             throw new AccessDeniedException();
@@ -225,7 +225,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         }
     }
 
-    public function toggle_action()
+    public function toggle_action(): void
     {
         if (!$this->is_root) {
             throw new AccessDeniedException();
