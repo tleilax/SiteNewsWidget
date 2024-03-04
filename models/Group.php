@@ -97,6 +97,11 @@ class Group extends \SimpleORMap
         $this->resetRelation('roles');
     }
 
+    /**
+     * @param callable $callback
+     *
+     * @return \User[]
+     */
     public function eachUser(callable $callback): array
     {
         $condition = "LEFT JOIN `roles_user` -- Explicit assignment

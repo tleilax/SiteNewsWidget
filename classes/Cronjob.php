@@ -149,7 +149,21 @@ class Cronjob extends \CronJob
         $add_statement = DBManager::get()->prepare($query);
         $add_statement->bindValue(':plugin_id', $plugin_id);
 
-        Group::find($group)->eachUser(function ($user) use ($delete_statement, $reposition_statement, $add_statement) {
+        Group::find($group)->eachUser(function (\User $user) use (
+            $delete_statement,
+            $reposition_statement,
+            $add_statement
+        ) {
+            if (class_exists(\WidgetUser::class)) {
+                \WidgetUser::setInitialWidgets($user->id);
+            } elseif (!\WidgetHelper::hasUserWidgets($user->id)) {
+                $old_id = $GLOBALS['user']->id;
+                $GLOBALS['user']->id = $user->id;
+                \WidgetHelper::setInitialPositions();
+                $GLOBALS['user']->id = $old_id;
+            }
+
+
             $delete_statement->bindValue(':user_id', $user->id);
             $delete_statement->execute();
 
