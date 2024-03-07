@@ -5,6 +5,7 @@ use Flexi_TemplateFactory;
 use PageLayout;
 use PluginEngine;
 use Request;
+use URLHelper;
 
 abstract class Plugin extends \StudIPPlugin
 {
