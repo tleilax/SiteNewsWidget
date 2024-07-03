@@ -29,8 +29,8 @@ class AddCronjob extends Migration
      */
     public function up()
     {
-        $task_id = CronjobScheduler::registerTask(new SiteNews\Cronjob());
-        $schedule = CronjobScheduler::schedulePeriodic($task_id);
+        $task_id = CronjobScheduler::getInstance()->registerTask(new SiteNews\Cronjob());
+        $schedule = CronjobScheduler::getInstance()->schedulePeriodic($task_id);
 
         $schedule->active = true;
         $schedule->store();
@@ -42,6 +42,6 @@ class AddCronjob extends Migration
     public function down()
     {
         $task_id = CronjobTask::findOneByClass(SiteNews\Cronjob::class)->task_id;
-        CronjobScheduler::unregisterTask($task_id);
+        CronjobScheduler::getInstance()->unregisterTask($task_id);
     }
 }
