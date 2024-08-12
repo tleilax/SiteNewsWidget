@@ -110,7 +110,7 @@ class Entry extends \SimpleORMap
      */
     public static function findByGroup(?string $group, bool $only_visible = true): array
     {
-        if (!User::findCurrent()) {
+        if (!\User::findCurrent()) {
             return [];
         }
 
