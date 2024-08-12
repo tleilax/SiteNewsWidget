@@ -110,6 +110,10 @@ class Entry extends \SimpleORMap
      */
     public static function findByGroup(?string $group, bool $only_visible = true): array
     {
+        if (!User::findCurrent()) {
+            return [];
+        }
+
         if ($group === null) {
             $condition = "JOIN `sitenews_entries_groups` USING (`news_id`)
                           JOIN `sitenews_groups_roles` USING (`group_id`)
