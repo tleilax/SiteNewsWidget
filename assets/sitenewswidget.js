@@ -33,27 +33,6 @@
         event.preventDefault();
     });
 
-    $(document).on('click', 'a.sitenews-active-toggle', function () {
-        const link = $(this).attr('href');
-
-        $.post(link).done(shown => {
-            const widget = $(this).closest('.studip-widget').find('.sitenews-widget');
-            const role = shown ? 'checkbox-unchecked' : 'checkbox-checked';
-
-            $(this).data('show-inactive', shown)
-                .find('img')
-                .attr('src', STUDIP.ASSETS_URL + 'images/icons/blue/' + role + '.svg');
-
-
-            widget.find('[data-active="false"]').toggle(shown);
-
-            const visibleEntries = widget.find('article.studip:visible').length;
-            $('.no-entries', widget).toggle(visibleEntries === 0);
-        });
-
-        return false;
-    });
-
     let new_counter = 1;
 
     $(document).on('click', '.group-administration button[name="new-group"]', function () {

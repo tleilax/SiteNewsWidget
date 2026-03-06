@@ -42,19 +42,22 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
 
         if ($this->is_root) {
             $nav = new Navigation('', $this->url_for('add'));
-            $nav->setImage(Icon::create('add'), tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
+            $nav->setImage(Icon::create('add'));
+            $nav->setLinkAttributes(tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
 
             $show_inactive = $GLOBALS['user']->cfg->SITE_NEWS_WIDGET_SHOW_INACTIVE;
             $nav = new Navigation('', $this->url_for('toggle'));
-            $nav->setImage(Icon::create($show_inactive ? 'checkbox-unchecked' : 'checkbox-checked'), tooltip2($this->_('Inaktive Einträge ausblenden')) + [
+            $nav->setImage(Icon::create($show_inactive ? 'checkbox-unchecked' : 'checkbox-checked'));
+            $nav->setLinkAttributes(tooltip2($this->_('Inaktive Einträge ausblenden')) + [
                 'class'              => 'sitenews-active-toggle',
                 'data-show-inactive' => json_encode($show_inactive),
             ]);
             $navigation[] = $nav;
 
             $nav = new Navigation('', $this->url_for('config'));
-            $nav->setImage(Icon::create('admin'), tooltip2($this->_('Einstellungen bearbeiten')) + ['data-dialog' => '']);
+            $nav->setImage(Icon::create('admin'));
+            $nav->setLinkAttributes(tooltip2($this->_('Einstellungen bearbeiten')) + ['data-dialog' => '']);
             $navigation[] = $nav;
         }
 
@@ -108,7 +111,7 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
         }
 
         if (!Request::isPost()) {
-            throw new InvalidMethodException();
+            throw new MethodNotAllowedException();
         }
 
         $entry = new SiteNews\Entry($id);
@@ -231,15 +234,15 @@ class SiteNewsWidget extends SiteNews\Plugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        if (!Request::isPost()) {
-            throw new MethodNotAllowedException();
-        }
-
         $GLOBALS['user']->cfg->store(
             'SITE_NEWS_WIDGET_SHOW_INACTIVE',
             !$GLOBALS['user']->cfg->SITE_NEWS_WIDGET_SHOW_INACTIVE
         );
 
-        $this->render_json($GLOBALS['user']->cfg->SITE_NEWS_WIDGET_SHOW_INACTIVE);
+        if (Request::isXhr()) {
+            $this->render_json($GLOBALS['user']->cfg->SITE_NEWS_WIDGET_SHOW_INACTIVE);
+        } else {
+            $this->redirect('dispatch.php/start');
+        }
     }
 }

@@ -71,7 +71,7 @@ abstract class Plugin extends \StudIPPlugin
 
     public function redirect(string $to): void
     {
-        page_close();
+        sess()->save();
 
         $url = URLHelper::getURL(...func_get_args());
         header("Location: {$url}");
