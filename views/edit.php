@@ -7,7 +7,7 @@
  * @var callable $_
  */
 ?>
-<form action="<?= $controller->link_for("store/{$entry->id}", compact('group')) ?>" method="post" class="sitenews-editor default">
+<form action="<?= $controller->link_for("store/{$entry->id}", ['group' => $group ?? null]) ?>" method="post" class="sitenews-editor default">
     <fieldset>
         <legend><?= $_('Inhalte bearbeiten') ?></legend>
 
